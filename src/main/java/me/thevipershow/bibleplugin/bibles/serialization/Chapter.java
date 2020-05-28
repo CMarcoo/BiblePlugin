@@ -1,4 +1,15 @@
-package me.thevipershow.bibleplugin.bibles.json;
+package me.thevipershow.bibleplugin.bibles.serialization;
 
-public class Chapter {
+import java.util.List;
+
+public final class Chapter {
+    final List<String> verses;
+
+    public Chapter(List<String> verses) {
+        this.verses = verses;
+    }
+
+    public List<String> getVerses() {
+        return verses;
+    }
 }
