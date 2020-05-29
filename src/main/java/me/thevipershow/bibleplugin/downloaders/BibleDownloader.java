@@ -8,7 +8,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 import me.thevipershow.bibleplugin.exceptions.ExceptionHandler;
 import org.bukkit.plugin.java.JavaPlugin;

@@ -1,8 +1,8 @@
 package me.thevipershow.bibleplugin.downloaders;
 
 public enum BibleURL {
-    ENGLISH_KING_JAMES("https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_kjv.json", "en_kjv"),
-    BASIC_ENGLISH("https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_bbe.json", "en_bbe");
+    ENGLISH_KING_JAMES("https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_kjv.json", "King-James_en"),
+    BASIC_ENGLISH("https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_bbe.json", "Basic_en");
 
     final String URL;
     final String name;
