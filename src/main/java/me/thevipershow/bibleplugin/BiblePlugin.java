@@ -13,5 +13,6 @@ public final class BiblePlugin extends JavaPlugin {
         bibleManager = BibleManager.getInstance(this);
         bibleManager.getBibleDownloader().createBibleFolder(Exception::printStackTrace);
         bibleManager.downloadBible(BibleURL.BASIC_ENGLISH);
+
     }
 }
