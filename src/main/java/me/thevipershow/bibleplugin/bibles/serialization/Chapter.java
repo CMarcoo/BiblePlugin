@@ -12,4 +12,6 @@ public final class Chapter {
     public List<String> getVerses() {
         return verses;
     }
+
+    public int getTotalVerses() {return verses.size();}
 }

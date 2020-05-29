@@ -6,8 +6,8 @@ public abstract class AbstractBibleImplementation implements BibleImplementation
     protected final List<Chapter> chapters;
     protected final String abbreviation;
 
-    public AbstractBibleImplementation(List<Chapter> chapters, String abbreviation) {
-        this.chapters = chapters;
-        this.abbreviation = abbreviation;
+    public AbstractBibleImplementation(Pair<List<Chapter>, String> bible) {
+        this.chapters = bible.getA();
+        this.abbreviation = bible.getB();
     }
 }
