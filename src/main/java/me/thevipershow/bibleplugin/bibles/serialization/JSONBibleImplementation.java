@@ -25,7 +25,6 @@ public final class JSONBibleImplementation extends AbstractBibleImplementation {
         super(deserializeBible(bibleJson));
     }
 
-
     @Override
     public String getAbbreviation() {
         return super.abbreviation;

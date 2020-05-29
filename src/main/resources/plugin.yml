@@ -4,3 +4,8 @@ main: me.thevipershow.bibleplugin.BiblePlugin
 api-version: '1.13'
 authors: [TheViperShow]
 description: 'A Minecraft plugin to interact with the sacred text.'
+commands:
+  bible:
+    description: 'Interact with the bible'
+    permission: 'bible.commands'
+    permission-message: '§8[§eBiblePlugin§8]§f: §7You are missing permissions!'

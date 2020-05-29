@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 import me.thevipershow.bibleplugin.exceptions.ExceptionHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -32,7 +35,7 @@ public final class BibleDownloader {
         }
     }
 
-    private String getBibleFileName(final BibleURL bibleURL) {
+    private String getBibleFileName(BibleURL bibleURL) {
         return BIBLE_FOLDER.getAbsolutePath() + File.separatorChar + bibleURL.name + ".json";
     }
 
@@ -50,5 +53,15 @@ public final class BibleDownloader {
         } catch (final IOException e) {
             handler.handle(e);
         }
+    }
+
+    public Optional<String> getBibleRawContent(BibleURL bibleURL, ExceptionHandler handler) {
+        try {
+            String rawContent = Files.lines(Paths.get(getBibleFileName(bibleURL))).collect(Collectors.joining());
+            return Optional.of(rawContent);
+        } catch (IOException e) {
+            handler.handle(e);
+        }
+        return Optional.empty();
     }
 }
