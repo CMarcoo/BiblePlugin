@@ -3,18 +3,18 @@ package me.thevipershow.bibleplugin.data;
 import java.util.List;
 
 public final class Book {
-    final String abbreviation;
+    final String abbrev;
     final String name;
     final List<Chapter> chapters;
 
-    public Book(String abbreviation, String name, List<Chapter> chapters) {
-        this.abbreviation = abbreviation;
+    public Book(String abbrev, String name, List<Chapter> chapters) {
+        this.abbrev = abbrev;
         this.name = name;
         this.chapters = chapters;
     }
 
-    public String getAbbreviation() {
-        return abbreviation;
+    public String getAbbrev() {
+        return abbrev;
     }
 
     public String getName() {

@@ -35,11 +35,13 @@ public final class BibleManager {
     }
 
     public void loadBible(BibleURL bibleURL) throws BibleException {
-        final Optional<String> optional = bibleDownloader.getBibleRawContent(bibleURL,
-                e -> plugin.getLogger().warning("Something went wrong when loading Bible \"" + bibleURL.name() + "\""));
-        if (optional.isPresent() && loadedBibles.stream().noneMatch(bible -> bible.getName().equalsIgnoreCase(bibleURL.name()))) {
-            final Bible bible = bibleFactory.createBible(optional.get(), bibleURL.name());
-            loadedBibles.add(bible);
+        if (loadedBibles.stream().noneMatch(bible -> bible.getName().equalsIgnoreCase(bibleURL.name()))) {
+            final Optional<String> optional = bibleDownloader.getBibleRawContent(bibleURL,
+                    e -> plugin.getLogger().warning("Something went wrong when loading Bible \"" + bibleURL.name() + "\""));
+            if (optional.isPresent()) {
+                final Bible bible = bibleFactory.createBible(optional.get(), bibleURL.name());
+                loadedBibles.add(bible);
+            }
         }
     }
 

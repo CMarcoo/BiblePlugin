@@ -1,7 +1,9 @@
 package me.thevipershow.bibleplugin.data;
 
 import com.google.gson.Gson;
-import java.util.Arrays;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
+import java.util.List;
 import me.thevipershow.bibleplugin.obtainer.FastBible;
 
 public final class BibleFactory {
@@ -23,7 +25,9 @@ public final class BibleFactory {
      * @return A Bible object.
      */
     public Bible createBible(String json, String bibleName) {
-        final Book[] books = gson.fromJson(json, Book[].class);
-        return new FastBible(Arrays.asList(books), bibleName);
+        Type booksArrayType = new TypeToken<List<Book>>(){}.getType();
+        List<Book> books = (List<Book>) gson.fromJson(json, booksArrayType);
+// TODO: 31/05/2020 fix this :
+        return new FastBible(books, bibleName);
     }
 }

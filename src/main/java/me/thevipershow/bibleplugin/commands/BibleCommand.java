@@ -1,10 +1,8 @@
 package me.thevipershow.bibleplugin.commands;
 
-import java.io.File;
+import java.util.HashSet;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import me.thevipershow.bibleplugin.data.Bible;
 import me.thevipershow.bibleplugin.data.Book;
 import me.thevipershow.bibleplugin.data.Chapter;
@@ -55,11 +53,13 @@ public final class BibleCommand implements CommandExecutor {
     }
 
     private void sendDownloaded(CommandSender sender) {
+        HashSet<Bible> bibleSet  = bibleManager.getLoadedBibles();
+        if (bibleSet.isEmpty()) {
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7You don't have any bible downloaded."));
+            return;
+        }
         final StringBuilder builder = new StringBuilder();
-        bibleManager.getLoadedBibles().forEach(bible -> {
-            builder.append("&a").append(bible.getName()).append("&7, ");
-        });
-
+        bibleSet.forEach(bible -> builder.append("&a").append(bible.getName()).append("&7, "));
         builder.setLength(builder.length() - 2);
         sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7" + builder.toString()));
     }
