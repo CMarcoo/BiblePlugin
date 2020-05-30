@@ -6,8 +6,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import me.thevipershow.bibleplugin.data.Bible;
+import me.thevipershow.bibleplugin.data.Book;
+import me.thevipershow.bibleplugin.data.Chapter;
 import me.thevipershow.bibleplugin.data.Verse;
 import me.thevipershow.bibleplugin.downloaders.BibleURL;
+import me.thevipershow.bibleplugin.exceptions.BibleException;
 import me.thevipershow.bibleplugin.managers.BibleManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -26,7 +29,7 @@ public final class BibleCommand implements CommandExecutor {
         this.bibleManager = BibleManager.getInstance(plugin);
     }
 
-    private static BibleCommand getInstance(JavaPlugin plugin) {
+    public static BibleCommand getInstance(JavaPlugin plugin) {
         return instance != null ? instance : (instance = new BibleCommand(plugin));
     }
 
@@ -65,17 +68,17 @@ public final class BibleCommand implements CommandExecutor {
         try {
             BibleURL bibleURL = BibleURL.valueOf(bibleName.toUpperCase(Locale.ROOT));
             bibleManager.downloadBible(bibleURL);
-            sender.sendMessage("&8[&eBiblePlugin&8]&f: &7Finished downloading bible " + bibleURL.name() + "`");
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Finished downloading bible &f`&e" + bibleURL.name() + "&f`"));
         } catch (final IllegalArgumentException e) {
-            sender.sendMessage("&8[&eBiblePlugin&8]&f: &7No bible with that identifier exist!");
-            sender.sendMessage("      &7Consider using &e/bible available &7to see which ones you can download!");
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7No bible with that identifier exist!"));
+            sender.sendMessage(color("      &7Consider using &e/bible available &7to see which ones you can download!"));
         }
     }
 
     private void searchForVerse(CommandSender sender, String bibleName, String verseSearch) {
         final Optional<Bible> optionalBible = bibleManager.getBible(bibleName);
         optionalBible.ifPresent(bible -> {
-            final String[] array = verseSearch.split(":");
+            final String[] array = verseSearch.split(":+");
             if (array.length == 3) {
                 final String bookName = array[0];
                 try {
@@ -95,6 +98,54 @@ public final class BibleCommand implements CommandExecutor {
                 sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7The search was invalid!"));
             }
         });
+    }
+
+    private void getVerses(CommandSender sender, String search) {
+        try {
+            String[] array = BibleGuard.validateVerseSearch(search);
+            final String bibleName = array[0], bookName = array[1];
+            final int chapterNumber = Integer.parseInt(array[2]);
+            final Chapter chapter = BibleOptionals.optionalChapterSearch(
+                    BibleOptionals.optionalBookSearch(
+                            BibleOptionals.optionalBibleSearch(bibleManager, bibleName), bookName), chapterNumber);
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Chapter &f`&e" + chapterNumber
+                    + "&f`&7 from book &f`&e" + bookName
+                    + "&f`&7 from Bible &f`&e" + bibleName + "&f`"));
+            sender.sendMessage(color("&7  has &f`&e" + chapter.getVerses().size() + "&f`&7 verses."));
+        } catch (BibleException bibleException) {
+            sender.sendMessage(color(bibleException.getMessage()));
+        }
+    }
+
+    private void getChapters(CommandSender sender, String search) {
+        try {
+            final String[] array = BibleGuard.validateChapterSearch(search);
+            final String bibleName = array[0], bookName = array[1];
+            final Book book = BibleOptionals.optionalBookSearch(BibleOptionals.optionalBibleSearch(bibleManager, bibleName), bookName);
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: Book &f`&e" + bookName + "&f`&7 from Bible &f`&e" + bibleName + "&f`"));
+            sender.sendMessage(color("&7  has &f`&e" + book.getChapters().size() + "&f`&7 chapters."));
+        } catch (BibleException bibleException) {
+            sender.sendMessage(color(bibleException.getMessage()));
+        }
+    }
+
+    private void printBooks(CommandSender sender, Bible bible) {
+        final StringBuilder builder = new StringBuilder();
+        for (final Book book : bible.getBooks())
+            builder.append("&e").append(book.getName()).append("&7, ");
+        builder.setLength(builder.length() - 2);
+        sender.sendMessage(color("&8[&eList&8]&7: " + builder.toString()));
+    }
+
+    private void getBooks(CommandSender sender, String search) {
+        try {
+            final Bible bible = BibleOptionals.optionalBibleSearch(bibleManager, search);
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: Bible &f`&e" + search + "&f`"));
+            sender.sendMessage(color("&7  has &f`&e" + bible.getBooks().size() + "&f`&7 books."));
+            printBooks(sender, bible);
+        } catch (BibleException bibleException) {
+            sender.sendMessage(color(bibleException.getMessage()));
+        }
     }
 
     @Override
@@ -117,17 +168,28 @@ public final class BibleCommand implements CommandExecutor {
                     }
                     break;
                 case 2: {
-                    if (args[0].equalsIgnoreCase("download")) {
-                        downloadBible(sender, args[1]);
-                    } else {
-                        return false;
+                    switch (args[0].toLowerCase(Locale.ROOT)) {
+                        case "download":
+                            downloadBible(sender, args[1]);
+                            break;
+                        case "books":
+                            getBooks(sender, args[1]);
+                            break;
+                        case "chapters":
+                            getChapters(sender, args[1]);
+                            break;
+                        case "verses":
+                            getVerses(sender, args[1]);
+                            break;
+                        default:
+                            return false;
                     }
                 }
                 break;
                 case 3: {
                     switch (args[0].toLowerCase(Locale.ROOT)) {
                         case "verse": {
-
+                            searchForVerse(sender, args[1], args[2]);
                         }
                         break;
                         case "occurrences": {
