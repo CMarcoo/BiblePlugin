@@ -9,7 +9,6 @@ import me.thevipershow.bibleplugin.data.Chapter;
 import me.thevipershow.bibleplugin.data.Verse;
 import me.thevipershow.bibleplugin.exceptions.BibleException;
 import org.apache.commons.lang.StringUtils;
-import sun.jvm.hotspot.opto.CompilerPhaseType;
 
 public final class FastBibleSearch extends BibleSearch {
     public FastBibleSearch(String search) throws BibleException {

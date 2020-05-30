@@ -66,34 +66,34 @@ public abstract class BibleSearch extends Search {
      *
      * @param word  A word or phrase.
      * @param bible The bible were the research will be performed
-     * @return an Optional that will contain a list of verses if found, an empty Optional otherwise.
+     * @return a List that will contain a list of verses if found, an empty List otherwise.
      */
-    public abstract Optional<List<Verse>> findVerseContainingWord(Bible bible, String word);
+    public abstract List<Verse> findVerseContainingWord(Bible bible, String word);
 
     /**
      * Find all the verses that contain a given word or phrase in a given book.
      *
      * @param word A word or phrase.
      * @param book The book were the research will be performed
-     * @return an Optional that will contain a list of verses if found, an empty Optional otherwise.
+     * @return a List that will contain a list of verses if found, an empty List otherwise.
      */
-    public abstract Optional<List<Verse>> findVerseContainingWord(Book book, String word);
+    public abstract List<Verse> findVerseContainingWord(Book book, String word);
 
     /**
      * Find all the verses that contain a given word or phrase in a given chapter.
      *
      * @param word    A word or phrase.
      * @param chapter The chapter were the research will be performed
-     * @return an Optional that will contain a list of verses if found, an empty Optional otherwise.
+     * @return a List that will contain a list of verses if found, an empty List otherwise.
      */
-    public abstract Optional<List<Verse>> findVerseContainingWord(Chapter chapter, String word);
+    public abstract List<Verse> findVerseContainingWord(Chapter chapter, String word);
 
     /**
      * Search for a book using its name in a Bible.
      *
      * @param bible The Bible.
      * @param name  The name of the book.
-     * @return an Optional that will contain the Book with the specified name if found, an empty Optional otherwise
+     * @return a List that will contain the Book with the specified name if found, an empty List otherwise
      */
     public abstract Optional<Book> findBook(Bible bible, String name);
 
