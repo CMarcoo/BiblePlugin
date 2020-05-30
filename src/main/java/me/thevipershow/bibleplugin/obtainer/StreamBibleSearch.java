@@ -1,11 +1,8 @@
 package me.thevipershow.bibleplugin.obtainer;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 import me.thevipershow.bibleplugin.data.Bible;
 import me.thevipershow.bibleplugin.data.Book;
 import me.thevipershow.bibleplugin.data.Chapter;
@@ -18,51 +15,86 @@ public final class StreamBibleSearch extends BibleSearch {
         super(search);
     }
 
+    /**
+     * Find how many times a word can be found in a Bible.
+     *
+     * @param bible The Bible.
+     * @param word  The word\phrase.
+     * @return The number of occurrences.
+     */
     @Override
     public long findWordOccurrences(Bible bible, String word) {
         return bible.getBooks().stream().mapToLong(book -> findWordOccurrences(book, word)).sum();
     }
 
+    /**
+     * Find how many times a word can be found in a book.
+     *
+     * @param book The book.
+     * @param word The word\phrase.
+     * @return The number of occurrences.
+     */
     @Override
     public long findWordOccurrences(Book book, String word) {
         return book.getChapters().stream().mapToLong(chapter -> findWordOccurrences(chapter, word)).sum();
     }
 
+    /**
+     * Find how many times a word can be found in a chapter.
+     *
+     * @param chapter The chapter.
+     * @param word    The word\phrase.
+     * @return The number of occurrences.
+     */
     @Override
     public long findWordOccurrences(Chapter chapter, String word) {
         return chapter.getVerses().stream().mapToLong(verse -> findWordOccurrences(verse, word)).sum();
     }
 
+    /**
+     * Find how many times a word can be found in a verse.
+     *
+     * @param verse The verse.
+     * @param word  The word\phrase.
+     * @return The number of occurrences.
+     */
     @Override
     public long findWordOccurrences(Verse verse, String word) {
         return StringUtils.countMatches(verse.getVerse(), word);
     }
 
+    /**
+     * Find all the verses that contain a given word or phrase in a given Bible.
+     *
+     * @param bible The bible where the research will be performed
+     * @param word  A word or phrase.
+     * @return a List that will contain a list of verses if found, an empty List otherwise.
+     */
     @Override
     public List<Verse> findVerseContainingWord(Bible bible, String word) {
         return bible.getBooks().stream()
-                .flatMap(book -> book.getChapters().stream().flatMap(chapter -> chapter.getVerses().stream()))
-                .filter(verse -> verse.getVerse().contains(word))
+                .flatMap(book -> findVerseContainingWord(book, word).stream())
                 .collect(Collectors.toList());
     }
 
     /**
      * Find all the verses that contain a given word or phrase in a given book.
      *
-     * @param book The book were the research will be performed
+     * @param book The book where the research will be performed
      * @param word A word or phrase.
      * @return a List that will contain a list of verses if found, an empty List otherwise.
      */
     @Override
     public List<Verse> findVerseContainingWord(Book book, String word) {
-        return null;
-        // TODO: 30/05/2020 finish this method 
+        return book.getChapters().stream()
+                .flatMap(chapter -> findVerseContainingWord(chapter, word).stream())
+                .collect(Collectors.toList());
     }
 
     /**
      * Find all the verses that contain a given word or phrase in a given chapter.
      *
-     * @param chapter The chapter were the research will be performed
+     * @param chapter The chapter where the research will be performed
      * @param word    A word or phrase.
      * @return a List that will contain a list of verses if found, an empty List otherwise.
      */
