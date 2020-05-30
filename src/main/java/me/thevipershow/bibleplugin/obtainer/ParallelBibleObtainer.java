@@ -8,6 +8,7 @@ import me.thevipershow.bibleplugin.data.Chapter;
 import me.thevipershow.bibleplugin.data.Verse;
 import me.thevipershow.bibleplugin.exceptions.BibleException;
 
+@Deprecated
 public final class ParallelBibleObtainer implements BibleObtainer {
     private static ParallelBibleObtainer instance = null;
 
@@ -52,7 +53,7 @@ public final class ParallelBibleObtainer implements BibleObtainer {
     }
 
     @Override
-    public ParallelStreamBible getBibleSearch(String word) throws BibleException {
-        return new ParallelStreamBible(word);
+    public BibleSearch getBibleSearch(String word) throws BibleException {
+        return null;
     }
 }

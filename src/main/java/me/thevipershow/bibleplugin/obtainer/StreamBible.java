@@ -9,8 +9,8 @@ import me.thevipershow.bibleplugin.data.Chapter;
 import me.thevipershow.bibleplugin.data.Verse;
 import org.apache.commons.lang.StringUtils;
 
-public final class StreamBibleSearch extends Bible {
-    public StreamBibleSearch(List<Book> books, String name) {
+public final class StreamBible extends Bible {
+    public StreamBible(List<Book> books, String name) {
         super(books, name);
     }
 
