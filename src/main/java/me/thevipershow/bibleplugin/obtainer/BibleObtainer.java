@@ -6,7 +6,9 @@ import me.thevipershow.bibleplugin.data.Bible;
 import me.thevipershow.bibleplugin.data.Book;
 import me.thevipershow.bibleplugin.data.Chapter;
 import me.thevipershow.bibleplugin.data.Verse;
+import me.thevipershow.bibleplugin.exceptions.BibleException;
 
+@Deprecated
 public interface BibleObtainer {
     /**
      * Get all books that the Bible contains.
@@ -37,5 +39,5 @@ public interface BibleObtainer {
         return verses;
     }
 
-    <T extends BibleSearch> T getBibleSearch(T type);
+    BibleSearch getBibleSearch(String word) throws BibleException;
 }

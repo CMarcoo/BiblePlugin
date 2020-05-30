@@ -10,4 +10,6 @@ public abstract class Search {
     public String getSearch() {
         return search;
     }
+
+
 }

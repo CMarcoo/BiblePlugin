@@ -7,12 +7,11 @@ import me.thevipershow.bibleplugin.data.Bible;
 import me.thevipershow.bibleplugin.data.Book;
 import me.thevipershow.bibleplugin.data.Chapter;
 import me.thevipershow.bibleplugin.data.Verse;
-import me.thevipershow.bibleplugin.exceptions.BibleException;
 import org.apache.commons.lang.StringUtils;
 
-public final class StreamBibleSearch extends BibleSearch {
-    public StreamBibleSearch(String search) throws BibleException {
-        super(search);
+public final class StreamBibleSearch extends Bible {
+    public StreamBibleSearch(List<Book> books, String name) {
+        super(books, name);
     }
 
     /**

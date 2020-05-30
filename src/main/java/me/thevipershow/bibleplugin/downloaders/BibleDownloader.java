@@ -58,9 +58,13 @@ public final class BibleDownloader {
         try {
             String rawContent = Files.lines(Paths.get(getBibleFileName(bibleURL))).collect(Collectors.joining());
             return Optional.of(rawContent);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             handler.handle(e);
         }
         return Optional.empty();
+    }
+
+    public File getBIBLE_FOLDER() {
+        return BIBLE_FOLDER;
     }
 }

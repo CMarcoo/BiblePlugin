@@ -1,34 +1,22 @@
 package me.thevipershow.bibleplugin.obtainer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import me.thevipershow.bibleplugin.data.Bible;
 import me.thevipershow.bibleplugin.data.Book;
 import me.thevipershow.bibleplugin.data.Chapter;
 import me.thevipershow.bibleplugin.data.Verse;
-import me.thevipershow.bibleplugin.exceptions.BibleException;
 import org.apache.commons.lang.StringUtils;
 
-public final class FastBibleSearch extends BibleSearch {
-    public FastBibleSearch(String search) throws BibleException {
-        super(search);
+public final class ParallelStreamBible extends Bible {
+    public ParallelStreamBible(List<Book> books, String name) {
+        super(books, name);
     }
 
-    /**
-     * Find how many times a word can be found in a Bible.
-     *
-     * @param bible The Bible.
-     * @param word  The word\phrase.
-     * @return The number of occurrences.
-     */
     @Override
     public long findWordOccurrences(Bible bible, String word) {
-        long count = 0L;
-        for (final Book book : bible.getBooks())
-            count += findWordOccurrences(book, word);
-
-        return count;
+        return bible.getBooks().parallelStream().mapToLong(book -> findWordOccurrences(book, word)).sum();
     }
 
     /**
@@ -40,11 +28,7 @@ public final class FastBibleSearch extends BibleSearch {
      */
     @Override
     public long findWordOccurrences(Book book, String word) {
-        long count = 0L;
-        for (final Chapter chapter : book.getChapters())
-            count += findWordOccurrences(chapter, word);
-
-        return count;
+        return book.getChapters().parallelStream().mapToLong(chapter -> findWordOccurrences(chapter, word)).sum();
     }
 
     /**
@@ -56,17 +40,13 @@ public final class FastBibleSearch extends BibleSearch {
      */
     @Override
     public long findWordOccurrences(Chapter chapter, String word) {
-        long count = 0L;
-        for (final Verse verse : chapter.getVerses())
-            count += findWordOccurrences(verse, word);
-
-        return count;
+        return chapter.getVerses().parallelStream().mapToLong(verse -> findWordOccurrences(verse, word)).sum();
     }
 
     /**
      * Find how many times a word can be found in a verse.
      *
-     * @param verse The chapter.
+     * @param verse The verse.
      * @param word  The word\phrase.
      * @return The number of occurrences.
      */
@@ -78,50 +58,41 @@ public final class FastBibleSearch extends BibleSearch {
     /**
      * Find all the verses that contain a given word or phrase in a given Bible.
      *
-     * @param bible The bible were the research will be performed
+     * @param bible The bible where the research will be performed
      * @param word  A word or phrase.
      * @return a List that will contain a list of verses if found, an empty List otherwise.
      */
     @Override
     public List<Verse> findVerseContainingWord(Bible bible, String word) {
-        final List<Verse> verses = new ArrayList<>();
-        for (final Book book : bible.getBooks())
-            verses.addAll(findVerseContainingWord(book, word));
-
-        return verses;
+        return bible.getBooks().stream()
+                .flatMap(book -> findVerseContainingWord(book, word).parallelStream())
+                .collect(Collectors.toList());
     }
 
     /**
      * Find all the verses that contain a given word or phrase in a given book.
      *
-     * @param book The book were the research will be performed
+     * @param book The book where the research will be performed
      * @param word A word or phrase.
      * @return a List that will contain a list of verses if found, an empty List otherwise.
      */
     @Override
     public List<Verse> findVerseContainingWord(Book book, String word) {
-        final List<Verse> verses = new ArrayList<>();
-        for (final Chapter chapter : book.getChapters())
-            verses.addAll(findVerseContainingWord(chapter, word));
-
-        return verses;
+        return book.getChapters().stream()
+                .flatMap(chapter -> findVerseContainingWord(chapter, word).parallelStream())
+                .collect(Collectors.toList());
     }
 
     /**
      * Find all the verses that contain a given word or phrase in a given chapter.
      *
-     * @param chapter The chapter were the research will be performed
+     * @param chapter The chapter where the research will be performed
      * @param word    A word or phrase.
      * @return a List that will contain a list of verses if found, an empty List otherwise.
      */
     @Override
     public List<Verse> findVerseContainingWord(Chapter chapter, String word) {
-        final List<Verse> verses = new ArrayList<>();
-        for (final Verse verse : chapter.getVerses())
-            if (verse.getVerse().contains(word))
-                verses.add(verse);
-
-        return verses;
+        return chapter.getVerses().parallelStream().filter(verse -> verse.getVerse().contains(word)).collect(Collectors.toList());
     }
 
     /**
@@ -133,10 +104,6 @@ public final class FastBibleSearch extends BibleSearch {
      */
     @Override
     public Optional<Book> findBook(Bible bible, String name) {
-        for (final Book book : bible.getBooks())
-            if (book.getName().equalsIgnoreCase(name))
-                return Optional.of(book);
-
-        return Optional.empty();
+        return bible.getBooks().stream().filter(book -> book.getName().equalsIgnoreCase(name)).findFirst();
     }
 }
