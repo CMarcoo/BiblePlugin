@@ -3,8 +3,10 @@ package me.thevipershow.bibleplugin.commands;
 import java.io.File;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import me.thevipershow.bibleplugin.data.Bible;
+import me.thevipershow.bibleplugin.data.Verse;
 import me.thevipershow.bibleplugin.downloaders.BibleURL;
 import me.thevipershow.bibleplugin.managers.BibleManager;
 import org.bukkit.ChatColor;
@@ -63,15 +65,36 @@ public final class BibleCommand implements CommandExecutor {
         try {
             BibleURL bibleURL = BibleURL.valueOf(bibleName.toUpperCase(Locale.ROOT));
             bibleManager.downloadBible(bibleURL);
-            sender.sendMessage("&8[&eBiblePlugin&8]&f: &7Finished downloading bible " + bibleURL.name()+ "`");
+            sender.sendMessage("&8[&eBiblePlugin&8]&f: &7Finished downloading bible " + bibleURL.name() + "`");
         } catch (final IllegalArgumentException e) {
             sender.sendMessage("&8[&eBiblePlugin&8]&f: &7No bible with that identifier exist!");
             sender.sendMessage("      &7Consider using &e/bible available &7to see which ones you can download!");
         }
     }
 
-    private void searchForWord(String bibleName, String word) {
-
+    private void searchForVerse(CommandSender sender, String bibleName, String verseSearch) {
+        final Optional<Bible> optionalBible = bibleManager.getBible(bibleName);
+        optionalBible.ifPresent(bible -> {
+            final String[] array = verseSearch.split(":");
+            if (array.length == 3) {
+                final String bookName = array[0];
+                try {
+                    final int chapterNumber = Integer.parseInt(array[1]);
+                    final int verseNumber = Integer.parseInt(array[2]);
+                    final Optional<Verse> verseOptional = bible.getVerse(bookName, chapterNumber, verseNumber);
+                    if (verseOptional.isPresent()) {
+                        sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Book &f`&e" + bookName + "&f`&7, Verse&f: &8[&e" + chapterNumber + "&f:&e" + verseNumber + "&8]"));
+                        sender.sendMessage(color("&f- &7" + verseOptional.get().getVerse()));
+                    } else {
+                        sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7That verse could not be found into the given book."));
+                    }
+                } catch (NumberFormatException e) {
+                    sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7The chapter\\verse was not a number!"));
+                }
+            } else {
+                sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7The search was invalid!"));
+            }
+        });
     }
 
     @Override

@@ -18,6 +18,12 @@ commands:
       - §8/<§ecommand§8> download §8[§ebible§8]
       §7Get a verse from a bible.
       - §8/<§ecommand§8> verse §8[§ebible§8] §8[§ebook§7:§echapter§7:verse§8]
+      §7Get number of verses from a chapter.
+      - §8/<§ecommand§8> verses §8[§ebible§7:§ebook§7:§echapter§8]
+      §7Get number of chapters from a book.
+      - §8/<§ecommand§8> chapters §8[§ebible§7:§ebook§8]
+      §7Get books names from a bible.
+      - §8/<§ecommand§8> books §8[§ebible§8]
       §7Get the occurrences of a word in a bible.
       - §8/<§ecommand§8> occurrences §8[§ebible§8] §8[§eword§8]
       §7Get the occurrences of a word in a bible's book.
