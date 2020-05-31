@@ -1,0 +1,5 @@
+#Always load these bible on startup
+bible:
+  keep-loaded:
+    - "English"
+    #- "German"

@@ -1,5 +1,6 @@
 package me.thevipershow.bibleplugin;
 
+import java.util.Locale;
 import me.thevipershow.bibleplugin.commands.BibleCommand;
 import me.thevipershow.bibleplugin.downloaders.BibleURL;
 import me.thevipershow.bibleplugin.exceptions.BibleException;
@@ -12,14 +13,20 @@ public final class BiblePlugin extends JavaPlugin {
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         bibleManager = BibleManager.getInstance(this);
         bibleManager.getBibleDownloader().createBibleFolder(Exception::printStackTrace);
-        bibleManager.downloadBible(BibleURL.BASIC_EN);
-        try {
-            bibleManager.loadBible(BibleURL.BASIC_EN);
-        } catch (BibleException bibleException) {
-            bibleException.printStackTrace();
-        }
+
+        getConfig().getStringList("bible.keep-loaded")
+                .forEach(s -> {
+                    try {
+                        BibleURL bibleURL = BibleURL.valueOf(s.toUpperCase(Locale.ROOT));
+                        bibleManager.downloadBible(bibleURL);
+                        bibleManager.loadBible(bibleURL);
+                    } catch (BibleException | IllegalArgumentException b) {
+                        b.printStackTrace();
+                    }
+                });
         getCommand("bible").setExecutor(BibleCommand.getInstance(this));
     }
 }

@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import me.thevipershow.bibleplugin.obtainer.FastBible;
 import me.thevipershow.bibleplugin.obtainer.ParallelStreamBible;
 
 public abstract class Bible {
@@ -20,7 +19,7 @@ public abstract class Bible {
             List<Chapter> chapterList = new ArrayList<>();
 
             JsonObject bookObj = jsonElement.getAsJsonObject();
-            String bookName = bookObj.get("name").getAsString();
+            String bookName = bookObj.get("name").getAsString().replaceAll("\\s+", "_");
             String bookAbbreviation = bookObj.get("abbrev").getAsString();
             JsonArray chaptersArray = bookObj.get("chapters").getAsJsonArray();
             for (JsonElement element : chaptersArray) {
@@ -138,7 +137,6 @@ public abstract class Bible {
     /**
      * Find how many times a word can be found in a Bible.
      *
-     * @param bible The Bible.
      * @param word  The word\phrase.
      * @return The number of occurrences.
      */

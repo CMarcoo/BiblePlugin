@@ -209,6 +209,13 @@ public final class BibleCommand implements CommandExecutor {
                         case "verses":
                             getVerses(sender, args[1]);
                             break;
+                        case "load":
+                            try {
+                                bibleManager.loadBible(BibleURL.valueOf(args[1].toUpperCase(Locale.ROOT)));
+                                sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Successfully loaded the bible."));
+                            } catch (BibleException bibleException) {
+                                sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Could not load that Bible."));
+                            }
                         default:
                             return false;
                     }
