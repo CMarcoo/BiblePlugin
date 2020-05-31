@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import me.thevipershow.bibleplugin.obtainer.FastBible;
+import me.thevipershow.bibleplugin.obtainer.ParallelStreamBible;
 
 public abstract class Bible {
 
@@ -33,7 +34,7 @@ public abstract class Bible {
             }
             booksList.add(new Book(bookAbbreviation, bookName, chapterList));
         }
-        return new FastBible(booksList);
+        return new ParallelStreamBible(booksList);
     };
 
     private final List<Book> books;
@@ -141,7 +142,7 @@ public abstract class Bible {
      * @param word  The word\phrase.
      * @return The number of occurrences.
      */
-    public abstract long findWordOccurrences(Bible bible, String word);
+    public abstract long findWordOccurrences(String word);
 
     /**
      * Find how many times a word can be found in a book.

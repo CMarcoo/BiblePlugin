@@ -1,5 +1,6 @@
 package me.thevipershow.bibleplugin.commands;
 
+import java.nio.channels.InterruptedByTimeoutException;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Optional;
@@ -131,6 +132,50 @@ public final class BibleCommand implements CommandExecutor {
         }
     }
 
+    private void sendOccurrences(long occurrences, CommandSender sender, String word) {
+        if (occurrences == 0)
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7There are no occurrences for &f`&e" + word + "&f`"));
+        else
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7There are &e" + occurrences + "&7 for &f`&e" + word + "&f`"));
+    }
+
+    private void wordOccurrencesBible(CommandSender sender, String bibleSearch, String word) {
+        try {
+            Bible bible = BibleOptionals.optionalBibleSearch(bibleManager, bibleSearch);
+            long occurrences = bible.findWordOccurrences(word);
+            sendOccurrences(occurrences, sender, word);
+        } catch (BibleException bibleException) {
+            sender.sendMessage(color(bibleException.getMessage()));
+        }
+    }
+
+    private void wordOccurrencesBook(CommandSender sender, String bookSearch, String word) {
+        try {
+            String[] array = BibleGuard.validateChapterSearch(bookSearch);
+            String bibleName = array[0], bookName = array[1];
+            Bible bible = BibleOptionals.optionalBibleSearch(bibleManager, bibleName);
+            Book book = BibleOptionals.optionalBookSearch(bible, bookName);
+            long occurrences = bible.findWordOccurrences(book, word);
+            sendOccurrences(occurrences, sender, word);
+        } catch (BibleException bibleException) {
+            sender.sendMessage(color(bibleException.getMessage()));
+        }
+    }
+
+    private void wordOccurrencesChapter(CommandSender sender, String chapterSearch, String word) {
+        try {
+            String[] array = BibleGuard.validateVerseSearch(chapterSearch);
+            String bibleName = array[0], bookName = array[1];
+            int chapterNumber = Integer.parseInt(array[2]);
+            Bible bible = BibleOptionals.optionalBibleSearch(bibleManager, bibleName);
+            Chapter chapter = BibleOptionals.optionalChapterSearch(BibleOptionals.optionalBookSearch(bible, bookName), chapterNumber);
+            long occurrences = bible.findWordOccurrences(chapter, word);
+            sendOccurrences(occurrences, sender, word);
+        } catch (BibleException bibleException) {
+
+        }
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         final int length = args.length;
@@ -176,11 +221,25 @@ public final class BibleCommand implements CommandExecutor {
                         }
                         break;
                         case "occurrences": {
-
+                            int search = args[1].split(":+").length;
+                            switch (search) {
+                                case 1:
+                                    wordOccurrencesBible(sender, args[1], args[2]);
+                                    break;
+                                case 2:
+                                    wordOccurrencesBook(sender, args[1], args[2]);
+                                    break;
+                                case 3:
+                                    wordOccurrencesChapter(sender, args[1], args[2]);
+                                    break;
+                                default:
+                                    return false;
+                            }
                         }
                         break;
                         case "find": {
-
+                            // TODO: 31/05/2020 implement!
+                            sender.sendMessage(color("&7command not available yet."));
                         }
                         break;
                     }

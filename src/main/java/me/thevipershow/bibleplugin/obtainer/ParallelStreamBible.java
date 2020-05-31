@@ -15,8 +15,8 @@ public final class ParallelStreamBible extends Bible {
     }
 
     @Override
-    public long findWordOccurrences(Bible bible, String word) {
-        return bible.getBooks().parallelStream().mapToLong(book -> findWordOccurrences(book, word)).sum();
+    public long findWordOccurrences(String word) {
+        return getBooks().parallelStream().mapToLong(book -> findWordOccurrences(book, word)).sum();
     }
 
     /**

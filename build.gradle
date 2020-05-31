@@ -1,4 +1,7 @@
-apply plugin: 'java'
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id("java")
+}
 
 group = pluginGroup
 version = pluginVersion
@@ -14,10 +17,16 @@ repositories {
     }
 }
 
+shadowJar {
+    relocate("com.google.gson","me.thevipershow.bibleplugin.libs.com.google.gson")
+}
+
 dependencies {
     testCompile group: 'org.hamcrest', name: 'hamcrest', version: '2.1'
     // https://mvnrepository.com/artifact/junit/junit
     testCompile group: 'junit', name: 'junit', version: '4.13'
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
     compileOnly 'org.bukkit:bukkit:1.15.2-R0.1-SNAPSHOT'
 }
 

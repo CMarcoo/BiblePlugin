@@ -1,8 +1,8 @@
 name: 'BiblePlugin'
 version: @version@
 main: me.thevipershow.bibleplugin.BiblePlugin
-api-version: '1.13'
 authors: [TheViperShow]
+api-version: '1.13'
 description: 'A Minecraft plugin to interact with the sacred text.'
 commands:
   bible:

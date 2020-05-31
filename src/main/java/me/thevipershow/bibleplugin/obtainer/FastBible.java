@@ -17,14 +17,13 @@ public final class FastBible extends Bible {
     /**
      * Find how many times a word can be found in a Bible.
      *
-     * @param bible The Bible.
      * @param word  The word\phrase.
      * @return The number of occurrences.
      */
     @Override
-    public long findWordOccurrences(Bible bible, String word) {
+    public long findWordOccurrences(String word) {
         long count = 0L;
-        for (final Book book : bible.getBooks())
+        for (final Book book : getBooks())
             count += findWordOccurrences(book, word);
 
         return count;

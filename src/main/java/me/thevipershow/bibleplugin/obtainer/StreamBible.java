@@ -17,13 +17,12 @@ public final class StreamBible extends Bible {
     /**
      * Find how many times a word can be found in a Bible.
      *
-     * @param bible The Bible.
      * @param word  The word\phrase.
      * @return The number of occurrences.
      */
     @Override
-    public long findWordOccurrences(Bible bible, String word) {
-        return bible.getBooks().stream().mapToLong(book -> findWordOccurrences(book, word)).sum();
+    public long findWordOccurrences(String word) {
+        return getBooks().stream().mapToLong(book -> findWordOccurrences(book, word)).sum();
     }
 
     /**
