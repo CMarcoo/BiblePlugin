@@ -10,6 +10,7 @@ import me.thevipershow.bibleplugin.data.Verse;
 import me.thevipershow.bibleplugin.downloaders.BibleURL;
 import me.thevipershow.bibleplugin.exceptions.BibleException;
 import me.thevipershow.bibleplugin.managers.BibleManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -53,7 +54,7 @@ public final class BibleCommand implements CommandExecutor {
     }
 
     private void sendDownloaded(CommandSender sender) {
-        HashSet<Bible> bibleSet  = bibleManager.getLoadedBibles();
+        HashSet<Bible> bibleSet = bibleManager.getLoadedBibles();
         if (bibleSet.isEmpty()) {
             sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7You don't have any bible downloaded."));
             return;
@@ -76,28 +77,15 @@ public final class BibleCommand implements CommandExecutor {
     }
 
     private void searchForVerse(CommandSender sender, String bibleName, String verseSearch) {
-        final Optional<Bible> optionalBible = bibleManager.getBible(bibleName);
-        optionalBible.ifPresent(bible -> {
-            final String[] array = verseSearch.split(":+");
-            if (array.length == 3) {
-                final String bookName = array[0];
-                try {
-                    final int chapterNumber = Integer.parseInt(array[1]);
-                    final int verseNumber = Integer.parseInt(array[2]);
-                    final Optional<Verse> verseOptional = bible.getVerse(bookName, chapterNumber, verseNumber);
-                    if (verseOptional.isPresent()) {
-                        sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Book &f`&e" + bookName + "&f`&7, Verse&f: &8[&e" + chapterNumber + "&f:&e" + verseNumber + "&8]"));
-                        sender.sendMessage(color("&f- &7" + verseOptional.get().getVerse()));
-                    } else {
-                        sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7That verse could not be found into the given book."));
-                    }
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7The chapter\\verse was not a number!"));
-                }
-            } else {
-                sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7The search was invalid!"));
-            }
-        });
+        try {
+            String[] array = BibleGuard.validateGetVerse(verseSearch);
+            String bookName = array[0];
+            int chapterNumber = Integer.parseInt(array[1]), verseNumber = Integer.parseInt(array[2]);
+            Verse verse = BibleOptionals.optionalVerseSearch(BibleOptionals.optionalChapterSearch(BibleOptionals.optionalBookSearch(BibleOptionals.optionalBibleSearch(bibleManager, bibleName), bookName), chapterNumber), verseNumber);
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7" + verse.getVerse()));
+        } catch (BibleException e) {
+            sender.sendMessage(color(e.getMessage()));
+        }
     }
 
     private void getVerses(CommandSender sender, String search) {
@@ -105,13 +93,10 @@ public final class BibleCommand implements CommandExecutor {
             String[] array = BibleGuard.validateVerseSearch(search);
             final String bibleName = array[0], bookName = array[1];
             final int chapterNumber = Integer.parseInt(array[2]);
-            final Chapter chapter = BibleOptionals.optionalChapterSearch(
-                    BibleOptionals.optionalBookSearch(
-                            BibleOptionals.optionalBibleSearch(bibleManager, bibleName), bookName), chapterNumber);
+            Chapter chapter = BibleOptionals.optionalChapterSearch(BibleOptionals.optionalBookSearch(BibleOptionals.optionalBibleSearch(bibleManager, bibleName), bookName), chapterNumber);
             sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Chapter &f`&e" + chapterNumber
                     + "&f`&7 from book &f`&e" + bookName
-                    + "&f`&7 from Bible &f`&e" + bibleName + "&f`"));
-            sender.sendMessage(color("&7  has &f`&e" + chapter.getVerses().size() + "&f`&7 verses."));
+                    + "&f`&7 from Bible &f`&e" + bibleName + "&f`" + "&7 has &f`&e" + chapter.getVerses().size() + "&f`&7 verses."));
         } catch (BibleException bibleException) {
             sender.sendMessage(color(bibleException.getMessage()));
         }
@@ -121,9 +106,8 @@ public final class BibleCommand implements CommandExecutor {
         try {
             final String[] array = BibleGuard.validateChapterSearch(search);
             final String bibleName = array[0], bookName = array[1];
-            final Book book = BibleOptionals.optionalBookSearch(BibleOptionals.optionalBibleSearch(bibleManager, bibleName), bookName);
-            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: Book &f`&e" + bookName + "&f`&7 from Bible &f`&e" + bibleName + "&f`"));
-            sender.sendMessage(color("&7  has &f`&e" + book.getChapters().size() + "&f`&7 chapters."));
+            Book book = BibleOptionals.optionalBookSearch(BibleOptionals.optionalBibleSearch(bibleManager, bibleName), bookName);
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: Book &f`&e" + bookName + "&f`&7 from Bible &f`&e" + bibleName + "&f`" + "&7 has &f`&e" + book.getChapters().size() + "&f`&7 chapters."));
         } catch (BibleException bibleException) {
             sender.sendMessage(color(bibleException.getMessage()));
         }
@@ -137,11 +121,10 @@ public final class BibleCommand implements CommandExecutor {
         sender.sendMessage(color("&8[&eList&8]&7: " + builder.toString()));
     }
 
-    private void getBooks(CommandSender sender, String search) {
+    private void getBooks(CommandSender sender, String bibleName) {
         try {
-            final Bible bible = BibleOptionals.optionalBibleSearch(bibleManager, search);
-            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: Bible &f`&e" + search + "&f`"));
-            sender.sendMessage(color("&7  has &f`&e" + bible.getBooks().size() + "&f`&7 books."));
+            Bible bible = BibleOptionals.optionalBibleSearch(bibleManager, bibleName);
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: Bible &f`&e" + bibleName + "&f`" + "&7 has &f`&e" + bible.getBooks().size() + "&f`&7 books."));
             printBooks(sender, bible);
         } catch (BibleException bibleException) {
             sender.sendMessage(color(bibleException.getMessage()));

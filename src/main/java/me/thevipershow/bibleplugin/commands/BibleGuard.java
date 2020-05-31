@@ -1,24 +1,44 @@
 package me.thevipershow.bibleplugin.commands;
 
-import java.util.stream.Collectors;
 import me.thevipershow.bibleplugin.data.Bible;
 import me.thevipershow.bibleplugin.exceptions.BibleException;
 
-public class BibleGuard {
-    public static String[] validateVerseSearch(String search) throws BibleException {
-        final String[] array = search.split(":+");
-        if (array.length != 3)
-            throw new BibleException("&8[&eBiblePlugin&8]&f: &7The search was invalid!");
+public final class BibleGuard {
+    public static String[] validateGetVerse(String search) throws BibleException {
         try {
-            Integer.parseInt(array[2]);
+            String[] array = search.split(":+");
+            String bookName = array[0];
+            int chapter = Integer.parseInt(array[1]);
+            int verse = Integer.parseInt(array[2]);
             return array;
-        } catch (final NumberFormatException e) {
-            throw new BibleException("&8[&eBiblePlugin&8]&f: &7The chapter &f`&e" + array[2] + "&f` &7was not a number!");
+        } catch (NumberFormatException e) {
+            throw new BibleException("&8[&eBiblePlugin&8]&f: &7The chapter or verse was not a number!");
+        } catch (IndexOutOfBoundsException e) {
+            throw new BibleException("&8[&eBiblePlugin&8]&f: &7The search had an invalid format!");
         }
     }
 
+    public static String[] validateVerseSearch(String search) throws BibleException {
+        try {
+            String[] array = parseSearch(search);
+            return array;
+        } catch (NumberFormatException e) {
+            throw new BibleException("&8[&eBiblePlugin&8]&f: &7The chapter or verse was not a number!");
+        } catch (IndexOutOfBoundsException e) {
+            throw new BibleException("&8[&eBiblePlugin&8]&f: &7The search had an invalid format!");
+        }
+    }
+
+    public static String[] parseSearch(String search) throws NumberFormatException, IndexOutOfBoundsException {
+        String[] array = search.split(":+");
+        String bibleName = array[0];
+        String bookName = array[1];
+        int chapter = Integer.parseInt(array[2]);
+        return array;
+    }
+
     public static String[] validateChapterSearch(String search) throws BibleException {
-        final String[] array = search.split(":+");
+        String[] array = search.split(":+");
         if (array.length != 2)
             throw new BibleException("&8[&eBiblePlugin&8]&f: &7The search was invalid!");
         return array;
