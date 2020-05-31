@@ -10,8 +10,8 @@ import me.thevipershow.bibleplugin.data.Verse;
 import org.apache.commons.lang.StringUtils;
 
 public final class ParallelStreamBible extends Bible {
-    public ParallelStreamBible(List<Book> books, String name) {
-        super(books, name);
+    public ParallelStreamBible(List<Book> books) {
+        super(books);
     }
 
     @Override

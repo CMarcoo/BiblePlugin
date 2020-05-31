@@ -1,14 +1,54 @@
 package me.thevipershow.bibleplugin.data;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import me.thevipershow.bibleplugin.obtainer.FastBible;
 
 public abstract class Bible {
+
+    final static JsonDeserializer<Bible> bibleDeserializer = (json, typeOfT, context) -> {
+        JsonArray booksArray = json.getAsJsonArray();
+        List<Book> booksList = new ArrayList<>();
+
+        for (JsonElement jsonElement : booksArray) {
+            List<Chapter> chapterList = new ArrayList<>();
+
+            JsonObject bookObj = jsonElement.getAsJsonObject();
+            String bookName = bookObj.get("name").getAsString();
+            String bookAbbreviation = bookObj.get("abbrev").getAsString();
+            JsonArray chaptersArray = bookObj.get("chapters").getAsJsonArray();
+            for (JsonElement element : chaptersArray) {
+                List<Verse> verseList = new ArrayList<>();
+
+                JsonArray pagesArray = element.getAsJsonArray();
+                for (JsonElement verseElement : pagesArray) {
+                    verseList.add(new Verse(verseElement.getAsString()));
+                }
+                chapterList.add(new Chapter(verseList));
+            }
+            booksList.add(new Book(bookAbbreviation, bookName, chapterList));
+        }
+        return new FastBible(booksList);
+    };
+
     private final List<Book> books;
-    private final String name;
+    private transient String name;
 
     public Bible(List<Book> books, String name) {
         this.books = books;
+        this.name = name;
+    }
+
+    public Bible(List<Book> books) {
+        this.books = books;
+    }
+
+    public void setName(String name) {
         this.name = name;
     }
 

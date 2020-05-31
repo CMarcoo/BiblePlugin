@@ -2,6 +2,7 @@ package me.thevipershow.bibleplugin.managers;
 
 import java.util.HashSet;
 import java.util.Optional;
+import me.thevipershow.bibleplugin.commands.BibleGuard;
 import me.thevipershow.bibleplugin.data.Bible;
 import me.thevipershow.bibleplugin.data.BibleFactory;
 import me.thevipershow.bibleplugin.downloaders.BibleDownloader;
@@ -39,9 +40,14 @@ public final class BibleManager {
             final Optional<String> optional = bibleDownloader.getBibleRawContent(bibleURL,
                     e -> plugin.getLogger().warning("Something went wrong when loading Bible \"" + bibleURL.name() + "\""));
             if (optional.isPresent()) {
-                final Bible bible = bibleFactory.createBible(optional.get(), bibleURL.name());
-                loadedBibles.add(bible);
+                final String fullText = optional.get();
+                final Bible bible = bibleFactory.createBible(fullText, bibleURL.name());
+                loadedBibles.add(BibleGuard.validateBible(bible));
+            } else {
+                plugin.getLogger().warning("Text from bible " + bibleURL.name() + " could not be read!");
             }
+        } else {
+            plugin.getLogger().info("That Bible was already loaded!");
         }
     }
 

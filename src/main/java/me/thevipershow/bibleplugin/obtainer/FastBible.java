@@ -10,8 +10,8 @@ import me.thevipershow.bibleplugin.data.Verse;
 import org.apache.commons.lang.StringUtils;
 
 public final class FastBible extends Bible {
-    public FastBible(List<Book> books, String name) {
-        super(books, name);
+    public FastBible(List<Book> books) {
+        super(books);
     }
 
     /**

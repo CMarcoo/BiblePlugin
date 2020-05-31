@@ -12,7 +12,6 @@ public final class BiblePlugin extends JavaPlugin {
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onEnable() {
-        // Plugin startup logic
         bibleManager = BibleManager.getInstance(this);
         bibleManager.getBibleDownloader().createBibleFolder(Exception::printStackTrace);
         bibleManager.downloadBible(BibleURL.BASIC_EN);
