@@ -6,7 +6,8 @@ public enum BibleURL {
     GERMAN("https://raw.githubusercontent.com/thiagobodruk/bible/master/json/de_schlachter.json","German"),
     FINNISH("https://raw.githubusercontent.com/thiagobodruk/bible/master/json/fi_finnish.json","Finnish"),
     GREEK("https://raw.githubusercontent.com/thiagobodruk/bible/master/json/el_greek.json","Greek"),
-    RUSSIAN("https://raw.githubusercontent.com/thiagobodruk/bible/master/json/ru_synodal.json", "Russian");
+    RUSSIAN("https://raw.githubusercontent.com/thiagobodruk/bible/master/json/ru_synodal.json", "Russian"),
+    SPANISH("https://raw.githubusercontent.com/thiagobodruk/bible/master/json/es_rvr.json","Spanish");
 
     final String URL;
     final String name;

@@ -39,7 +39,7 @@ public final class BibleCommand implements CommandExecutor {
 
     private void permissionCheck(CommandSender sender, Permission permission, PermissionCheck check) {
         if (sender.hasPermission(permission.getPermission())) {
-            check.runWithPermission();
+            check.runWithPermission(sender);
         } else {
             sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7You are missing permissions!"));
         }
@@ -69,8 +69,11 @@ public final class BibleCommand implements CommandExecutor {
     private void downloadBible(CommandSender sender, String bibleName) {
         try {
             BibleURL bibleURL = BibleURL.valueOf(bibleName.toUpperCase(Locale.ROOT));
+            final long operationStartTime = System.currentTimeMillis();
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Starting downloading bible &f`&e" + bibleURL.name() + "&f`"));
             bibleManager.downloadBible(bibleURL);
-            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Finished downloading bible &f`&e" + bibleURL.name() + "&f`"));
+            final long timeTaken = (System.currentTimeMillis() - operationStartTime) / 1000000;
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Finished downloading bible &f`&e" + bibleURL.name() + "&f`&7 in &e" + timeTaken + " &7ms"));
         } catch (final IllegalArgumentException e) {
             sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7No bible with that identifier exist!"));
             sender.sendMessage(color("      &7Consider using &e/bible available &7to see which ones you can download!"));
@@ -108,7 +111,7 @@ public final class BibleCommand implements CommandExecutor {
             final String[] array = BibleGuard.validateChapterSearch(search);
             final String bibleName = array[0], bookName = array[1];
             Book book = BibleOptionals.optionalBookSearch(BibleOptionals.optionalBibleSearch(bibleManager, bibleName), bookName);
-            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: Book &f`&e" + bookName + "&f`&7 from Bible &f`&e" + bibleName + "&f`" + "&7 has &f`&e" + book.getChapters().size() + "&f`&7 chapters."));
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Book &f`&e" + bookName + "&f`&7 from Bible &f`&e" + bibleName + "&f`" + "&7 has &f`&e" + book.getChapters().size() + "&f`&7 chapters."));
         } catch (BibleException bibleException) {
             sender.sendMessage(color(bibleException.getMessage()));
         }
@@ -125,7 +128,7 @@ public final class BibleCommand implements CommandExecutor {
     private void getBooks(CommandSender sender, String bibleName) {
         try {
             Bible bible = BibleOptionals.optionalBibleSearch(bibleManager, bibleName);
-            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: Bible &f`&e" + bibleName + "&f`" + "&7 has &f`&e" + bible.getBooks().size() + "&f`&7 books."));
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Bible &f`&e" + bibleName + "&f`" + "&7 has &f`&e" + bible.getBooks().size() + "&f`&7 books."));
             printBooks(sender, bible);
         } catch (BibleException bibleException) {
             sender.sendMessage(color(bibleException.getMessage()));
@@ -136,7 +139,7 @@ public final class BibleCommand implements CommandExecutor {
         if (occurrences == 0)
             sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7There are no occurrences for &f`&e" + word + "&f`"));
         else
-            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7There are &e" + occurrences + "&7 for &f`&e" + word + "&f`"));
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7There are occurrences &e" + occurrences + "&7 for &f`&e" + word + "&f`"));
     }
 
     private void wordOccurrencesBible(CommandSender sender, String bibleSearch, String word) {
@@ -172,7 +175,17 @@ public final class BibleCommand implements CommandExecutor {
             long occurrences = bible.findWordOccurrences(chapter, word);
             sendOccurrences(occurrences, sender, word);
         } catch (BibleException bibleException) {
+            sender.sendMessage(color(bibleException.getMessage()));
+        }
+    }
 
+    private void loadBible(String bibleName, CommandSender sender) {
+        try {
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Starting to load the bible."));
+            bibleManager.loadBible(BibleURL.valueOf(bibleName.toUpperCase(Locale.ROOT)));
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Successfully loaded the bible."));
+        } catch (BibleException bibleException) {
+            sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Could not load that Bible."));
         }
     }
 
@@ -186,10 +199,10 @@ public final class BibleCommand implements CommandExecutor {
                 case 1:
                     switch (args[0].toLowerCase(Locale.ROOT)) {
                         case "available":
-                            sendAvailable(sender);
+                            permissionCheck(sender, Permission.AVAILABLE, this::sendAvailable);
                             break;
                         case "downloaded":
-                            sendDownloaded(sender);
+                            permissionCheck(sender, Permission.DOWNLOADED, this::sendDownloaded);
                             break;
                         default:
                             return false;
@@ -198,24 +211,20 @@ public final class BibleCommand implements CommandExecutor {
                 case 2: {
                     switch (args[0].toLowerCase(Locale.ROOT)) {
                         case "download":
-                            downloadBible(sender, args[1]);
+                            permissionCheck(sender, Permission.DOWNLOAD, s -> downloadBible(s, args[1]));
                             break;
                         case "books":
-                            getBooks(sender, args[1]);
+                            permissionCheck(sender, Permission.BOOKS, s -> getBooks(sender, args[1]));
                             break;
                         case "chapters":
-                            getChapters(sender, args[1]);
+                            permissionCheck(sender, Permission.CHAPTERS, s -> getChapters(s, args[1]));
                             break;
                         case "verses":
-                            getVerses(sender, args[1]);
+                            permissionCheck(sender, Permission.VERSES, s -> getVerses(s, args[1]));
                             break;
                         case "load":
-                            try {
-                                bibleManager.loadBible(BibleURL.valueOf(args[1].toUpperCase(Locale.ROOT)));
-                                sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Successfully loaded the bible."));
-                            } catch (BibleException bibleException) {
-                                sender.sendMessage(color("&8[&eBiblePlugin&8]&f: &7Could not load that Bible."));
-                            }
+                            permissionCheck(sender, Permission.LOAD, s -> loadBible(args[1], s));
+                            break;
                         default:
                             return false;
                     }
@@ -224,20 +233,20 @@ public final class BibleCommand implements CommandExecutor {
                 case 3: {
                     switch (args[0].toLowerCase(Locale.ROOT)) {
                         case "verse": {
-                            searchForVerse(sender, args[1], args[2]);
+                            permissionCheck(sender, Permission.VERSE, s -> searchForVerse(s, args[1], args[2]));
                         }
                         break;
                         case "occurrences": {
                             int search = args[1].split(":+").length;
                             switch (search) {
                                 case 1:
-                                    wordOccurrencesBible(sender, args[1], args[2]);
+                                    permissionCheck(sender, Permission.OCCURRENCES, s -> wordOccurrencesBible(s, args[1], args[2]));
                                     break;
                                 case 2:
-                                    wordOccurrencesBook(sender, args[1], args[2]);
+                                    permissionCheck(sender, Permission.OCCURRENCES, s -> wordOccurrencesBook(s, args[1], args[2]));
                                     break;
                                 case 3:
-                                    wordOccurrencesChapter(sender, args[1], args[2]);
+                                    permissionCheck(sender, Permission.OCCURRENCES, s -> wordOccurrencesChapter(s, args[1], args[2]));
                                     break;
                                 default:
                                     return false;
@@ -256,8 +265,6 @@ public final class BibleCommand implements CommandExecutor {
                     return false;
             }
         }
-
-
         return true;
     }
 }
