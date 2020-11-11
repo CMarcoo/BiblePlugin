@@ -23,7 +23,6 @@ public final class BibleManager {
         this.plugin = plugin;
         this.bibleDownloader = BibleDownloader.getInstance(plugin);
         this.bibleFactory = BibleFactory.getInstance();
-
     }
 
     public static BibleManager getInstance(JavaPlugin plugin) {
@@ -51,11 +50,15 @@ public final class BibleManager {
         }
     }
 
-    public BibleDownloader getBibleDownloader() {
+    public final BibleDownloader getBibleDownloader() {
         return bibleDownloader;
     }
 
-    public HashSet<Bible> getLoadedBibles() {
+    /**
+     * Get all of the currently loaded bibles
+     * @return a HashSet of Bibles
+     */
+    public final HashSet<Bible> getLoadedBibles() {
         return loadedBibles;
     }
 
@@ -65,7 +68,7 @@ public final class BibleManager {
      * @param bibleName The name of the bible to search for.
      * @return An Optional with the Bible if found, an empty Optional otherwise.
      */
-    public Optional<Bible> getBible(String bibleName) {
+    public final Optional<Bible> getBible(String bibleName) {
         for (final Bible bible : loadedBibles) {
             if (bible.getName().equalsIgnoreCase(bibleName))
                 return Optional.of(bible);

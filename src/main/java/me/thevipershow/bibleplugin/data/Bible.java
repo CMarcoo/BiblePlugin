@@ -7,23 +7,58 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import me.thevipershow.bibleplugin.BiblePlugin;
+import me.thevipershow.bibleplugin.obtainer.FastBible;
 import me.thevipershow.bibleplugin.obtainer.ParallelStreamBible;
+import me.thevipershow.bibleplugin.obtainer.StreamBible;
 
 public abstract class Bible {
 
-    final static JsonDeserializer<Bible> bibleDeserializer = (json, typeOfT, context) -> {
+    public enum BibleType {
+        STREAM(StreamBible.class, "stream"), PARALLEL_STREAM(ParallelStreamBible.class, "parallel-stream"), FAST(FastBible.class, "fast");
+
+        private final Class<? extends Bible> bibleImpl;
+        private final String name;
+
+        BibleType(Class<? extends Bible> bibleImpl, String name) {
+            this.bibleImpl = bibleImpl;
+            this.name = name;
+        }
+
+        public final Bible build(final List<Book> books) {
+            try {
+                return bibleImpl.getConstructor(List.class).newInstance(books);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        public final Class<? extends Bible> getBibleImpl() {
+            return bibleImpl;
+        }
+
+        public final String getName() {
+            return name;
+        }
+    }
+
+    /**
+     * Deserializer used to read a bible from my standard JSON formatting.
+     */
+    public static final JsonDeserializer<Bible> bibleDeserializer = (json, typeOfT, context) -> {
         JsonArray booksArray = json.getAsJsonArray();
-        List<Book> booksList = new ArrayList<>();
+        final List<Book> booksList = new ArrayList<>();
 
         for (JsonElement jsonElement : booksArray) {
-            List<Chapter> chapterList = new ArrayList<>();
+            final List<Chapter> chapterList = new ArrayList<>();
 
             JsonObject bookObj = jsonElement.getAsJsonObject();
             String bookName = bookObj.get("name").getAsString().replaceAll("\\s+", "_");
             String bookAbbreviation = bookObj.get("abbrev").getAsString();
             JsonArray chaptersArray = bookObj.get("chapters").getAsJsonArray();
             for (JsonElement element : chaptersArray) {
-                List<Verse> verseList = new ArrayList<>();
+                final List<Verse> verseList = new ArrayList<>();
 
                 JsonArray pagesArray = element.getAsJsonArray();
                 for (JsonElement verseElement : pagesArray) {
@@ -33,7 +68,7 @@ public abstract class Bible {
             }
             booksList.add(new Book(bookAbbreviation, bookName, chapterList));
         }
-        return new ParallelStreamBible(booksList);
+        return BiblePlugin.getPreferredBibleType().build(booksList);
     };
 
     private final List<Book> books;
@@ -173,10 +208,9 @@ public abstract class Bible {
      * Find all the verses that contain a given word or phrase in a given Bible.
      *
      * @param word  A word or phrase.
-     * @param bible The bible were the research will be performed
      * @return a List that will contain a list of verses if found, an empty List otherwise.
      */
-    public abstract List<Verse> findVerseContainingWord(Bible bible, String word);
+    public abstract List<Verse> findVerseContainingWord(String word);
 
     /**
      * Find all the verses that contain a given word or phrase in a given book.
@@ -199,9 +233,9 @@ public abstract class Bible {
     /**
      * Search for a book using its name in a Bible.
      *
-     * @param bible The Bible.
      * @param name  The name of the book.
      * @return a List that will contain the Book with the specified name if found, an empty List otherwise
      */
-    public abstract Optional<Book> findBook(Bible bible, String name);
+    public abstract Optional<Book> findBook(String name);
+
 }

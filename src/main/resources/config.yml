@@ -1,5 +1,14 @@
 #Always load these bible on startup
 bible:
+  # These are types for internal implementation of the bible engine,
+  # all of these types use very different styles of loading and search,
+  # which can greatly affect your performance and the speed results.
+  # The available values are: ["stream", "parallel-stream", "fast"]
+  # Fast is the recommended type if you have an average system and want to obtain good reults.
+  # If you instead want to use multithreading distribution , and use more memory in order
+  # to obtain even faster results you can use the parallel-stream option.
+  # The 'stream' is a way in between of those two.
+  implementation: "fast"
   keep-loaded:
     - "English"
     #- "German"

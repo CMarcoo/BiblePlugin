@@ -64,13 +64,12 @@ public final class StreamBible extends Bible {
     /**
      * Find all the verses that contain a given word or phrase in a given Bible.
      *
-     * @param bible The bible where the research will be performed
      * @param word  A word or phrase.
      * @return a List that will contain a list of verses if found, an empty List otherwise.
      */
     @Override
-    public List<Verse> findVerseContainingWord(Bible bible, String word) {
-        return bible.getBooks().stream()
+    public List<Verse> findVerseContainingWord(String word) {
+        return this.getBooks().stream()
                 .flatMap(book -> findVerseContainingWord(book, word).stream())
                 .collect(Collectors.toList());
     }
@@ -104,12 +103,11 @@ public final class StreamBible extends Bible {
     /**
      * Search for a book using its name in a Bible.
      *
-     * @param bible The Bible.
      * @param name  The name of the book.
      * @return a List that will contain the Book with the specified name if found, an empty List otherwise
      */
     @Override
-    public Optional<Book> findBook(Bible bible, String name) {
-        return bible.getBooks().stream().filter(book -> book.getName().equalsIgnoreCase(name)).findFirst();
+    public Optional<Book> findBook(String name) {
+        return this.getBooks().stream().filter(book -> book.getName().equalsIgnoreCase(name)).findFirst();
     }
 }
