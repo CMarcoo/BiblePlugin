@@ -50,6 +50,7 @@ public abstract class Bible {
         JsonArray booksArray = json.getAsJsonArray();
         final List<Book> booksList = new ArrayList<>();
 
+        int bookCount = 1;
         for (JsonElement jsonElement : booksArray) {
             final List<Chapter> chapterList = new ArrayList<>();
 
@@ -57,16 +58,22 @@ public abstract class Bible {
             String bookName = bookObj.get("name").getAsString().replaceAll("\\s+", "_");
             String bookAbbreviation = bookObj.get("abbrev").getAsString();
             JsonArray chaptersArray = bookObj.get("chapters").getAsJsonArray();
+            int chapterCount = 1;
             for (JsonElement element : chaptersArray) {
                 final List<Verse> verseList = new ArrayList<>();
 
-                JsonArray pagesArray = element.getAsJsonArray();
-                for (JsonElement verseElement : pagesArray) {
-                    verseList.add(new Verse(verseElement.getAsString()));
+                final JsonArray pagesArray = element.getAsJsonArray();
+
+                for (int verseCount = 0; verseCount < pagesArray.size(); verseCount++) {
+                    final JsonElement verseElement = pagesArray.get(verseCount);
+                    verseList.add(new Verse(verseElement.getAsString(), verseCount));
                 }
-                chapterList.add(new Chapter(verseList));
+
+                chapterList.add(new Chapter(verseList, chapterCount));
+                chapterCount++;
             }
-            booksList.add(new Book(bookAbbreviation, bookName, chapterList));
+            booksList.add(new Book(bookAbbreviation, bookName, chapterList, bookCount));
+            bookCount++;
         }
         return BiblePlugin.getPreferredBibleType().build(booksList);
     };
@@ -83,7 +90,7 @@ public abstract class Bible {
         this.books = books;
     }
 
-    public void setName(String name) {
+    public final void setName(String name) {
         this.name = name;
     }
 
@@ -102,9 +109,11 @@ public abstract class Bible {
      * @return An Optional with the book if it was found, an empty Optional otherwise.
      */
     public Optional<Book> getBook(String bookName) {
-        for (final Book book : books)
-            if (book.name.equalsIgnoreCase(bookName))
+        for (final Book book : books) {
+            if (book.getName().equalsIgnoreCase(bookName)) {
                 return Optional.of(book);
+            }
+        }
         return Optional.empty();
     }
 
@@ -117,8 +126,9 @@ public abstract class Bible {
      * @return An Optional with the chapter if it was found, an empty Optional otherwise.
      */
     public Optional<Chapter> getChapter(Book book, int chapterNumber) {
-        if (chapterNumber > 0 && chapterNumber <= book.getChapters().size())
+        if (chapterNumber > 0 && chapterNumber <= book.getChapters().size()) {
             return Optional.of(book.getChapters().get(chapterNumber - 1));
+        }
         return Optional.empty();
     }
 
@@ -132,8 +142,9 @@ public abstract class Bible {
      */
     public Optional<Chapter> getChapter(String bookName, int chapterNumber) {
         final Optional<Book> book = getBook(bookName);
-        if (book.isPresent())
+        if (book.isPresent()) {
             return getChapter(book.get(), chapterNumber);
+        }
         return Optional.empty();
     }
 
@@ -145,8 +156,9 @@ public abstract class Bible {
      * @return An Optional with the verse if it was found, an empty Optional otherwise.
      */
     public Optional<Verse> getVerse(Chapter chapter, int verseNumber) {
-        if (chapter.getVerses().size() <= verseNumber)
+        if (chapter.getVerses().size() <= verseNumber) {
             return Optional.of(chapter.getVerses().get(verseNumber - 1));
+        }
         return Optional.empty();
     }
 
@@ -163,8 +175,9 @@ public abstract class Bible {
         final Optional<Book> book = getBook(bookName);
         if (book.isPresent()) {
             final Optional<Chapter> chapter = getChapter(book.get(), chapterNumber);
-            if (chapter.isPresent())
+            if (chapter.isPresent()) {
                 return getVerse(chapter.get(), verseNumber);
+            }
         }
         return Optional.empty();
     }
@@ -172,7 +185,7 @@ public abstract class Bible {
     /**
      * Find how many times a word can be found in a Bible.
      *
-     * @param word  The word\phrase.
+     * @param word The word\phrase.
      * @return The number of occurrences.
      */
     public abstract long findWordOccurrences(String word);
@@ -207,7 +220,7 @@ public abstract class Bible {
     /**
      * Find all the verses that contain a given word or phrase in a given Bible.
      *
-     * @param word  A word or phrase.
+     * @param word A word or phrase.
      * @return a List that will contain a list of verses if found, an empty List otherwise.
      */
     public abstract List<Verse> findVerseContainingWord(String word);
@@ -233,7 +246,7 @@ public abstract class Bible {
     /**
      * Search for a book using its name in a Bible.
      *
-     * @param name  The name of the book.
+     * @param name The name of the book.
      * @return a List that will contain the Book with the specified name if found, an empty List otherwise
      */
     public abstract Optional<Book> findBook(String name);

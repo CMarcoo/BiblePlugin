@@ -1,13 +1,20 @@
 package me.thevipershow.bibleplugin.data;
 
-public final class Verse {
-    final String verse;
+public final class Verse implements Numbered {
+    private final String verse;
+    private final int number;
 
-    public Verse(String verse) {
+    public Verse(String verse, int number) {
         this.verse = verse;
+        this.number = number;
     }
 
-    public String getVerse() {
+    public final String getVerse() {
         return verse;
+    }
+
+    @Override
+    public final int getNumber() {
+        return number;
     }
 }

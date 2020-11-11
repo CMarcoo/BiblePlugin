@@ -2,8 +2,6 @@ package me.thevipershow.bibleplugin.commands;
 
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
 import me.thevipershow.bibleplugin.data.Bible;
 import me.thevipershow.bibleplugin.data.Book;
 import me.thevipershow.bibleplugin.data.Chapter;
@@ -11,6 +9,10 @@ import me.thevipershow.bibleplugin.data.Verse;
 import me.thevipershow.bibleplugin.downloaders.BibleURL;
 import me.thevipershow.bibleplugin.exceptions.BibleException;
 import me.thevipershow.bibleplugin.managers.BibleManager;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -82,6 +84,33 @@ public final class BibleCommand implements CommandExecutor {
         }
     }
 
+    private void printNavigator(Player player) {
+        PlayerBibleData playerBibleData = bibleDataManager.getPlayerBibleDataMap().get(player.getUniqueId());
+        Bible currentBible = playerBibleData.getCurrentBible();
+        Book currentBook = playerBibleData.getCurrentBook();
+        Chapter chapter = playerBibleData.getCurrentChapter();
+        Verse currentVerse = playerBibleData.getCurrentVerse();
+        final BaseComponent result = new TextComponent();
+        if (currentVerse != null && chapter.getVerses().size() >= currentVerse.getNumber() + 1) {
+            BaseComponent component = new TextComponent(colour("&7[&aNEXT VERSE&7]"));
+            component.setClickEvent(new ClickEvent(
+                    ClickEvent.Action.RUN_COMMAND,
+                    String.format("/bible verse %s %s:%d:%d", currentBible.getName(), currentBook.getName(), chapter.getNumber(), currentVerse.getNumber() + 1)));
+
+            result.addExtra(component);
+        }
+        if (currentVerse != null && currentVerse.getNumber() - 1 >= 1 && chapter.getVerses().size() >= currentVerse.getNumber() -1) {
+            BaseComponent component = new TextComponent(colour("&7[&aPREV. VERSE&7]"));
+            component.setClickEvent(new ClickEvent(
+                    ClickEvent.Action.RUN_COMMAND,
+                    String.format("/bible verse %s %s:%d:%d", currentBible.getName(), currentBook.getName(), chapter.getNumber(), currentVerse.getNumber() - 1)));
+
+            result.addExtra(component);
+        }
+
+        player.spigot().sendMessage(result);
+    }
+
     private void searchForVerse(CommandSender sender, String bibleName, String verseSearch) {
         try {
             String[] array = BibleGuard.validateGetVerse(verseSearch);
@@ -99,6 +128,7 @@ public final class BibleCommand implements CommandExecutor {
                 bibleDataManager.update(player, BibleSection.BOOK, book);       // into his data map.
                 bibleDataManager.update(player, BibleSection.CHAPTER, chapter); //
                 bibleDataManager.update(player, BibleSection.VERSE, verse);
+                printNavigator(player);
             }
         } catch (BibleException e) {
             sender.sendMessage(colour(e.getMessage()));

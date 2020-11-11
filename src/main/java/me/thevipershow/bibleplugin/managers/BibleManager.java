@@ -8,7 +8,6 @@ import me.thevipershow.bibleplugin.data.BibleFactory;
 import me.thevipershow.bibleplugin.downloaders.BibleDownloader;
 import me.thevipershow.bibleplugin.downloaders.BibleURL;
 import me.thevipershow.bibleplugin.exceptions.BibleException;
-import me.thevipershow.bibleplugin.obtainer.BibleObtainer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class BibleManager {
@@ -27,6 +26,16 @@ public final class BibleManager {
 
     public static BibleManager getInstance(JavaPlugin plugin) {
         return instance != null ? instance : (instance = new BibleManager(plugin));
+    }
+
+    /**
+     * Return the instance of the BibleManager singleton
+     *
+     * @return A valid instance if the plugin has been correctly loaded and is present on the server,
+     * otherwise returns a null instance.
+     */
+    public static BibleManager getInstance() {
+        return instance;
     }
 
     public void downloadBible(BibleURL bibleURL) {
@@ -56,6 +65,7 @@ public final class BibleManager {
 
     /**
      * Get all of the currently loaded bibles
+     *
      * @return a HashSet of Bibles
      */
     public final HashSet<Bible> getLoadedBibles() {
