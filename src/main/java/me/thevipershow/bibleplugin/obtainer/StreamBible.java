@@ -7,7 +7,6 @@ import me.thevipershow.bibleplugin.data.Bible;
 import me.thevipershow.bibleplugin.data.Book;
 import me.thevipershow.bibleplugin.data.Chapter;
 import me.thevipershow.bibleplugin.data.Verse;
-import org.apache.commons.lang.StringUtils;
 
 public final class StreamBible extends Bible {
     public StreamBible(List<Book> books) {
@@ -58,7 +57,13 @@ public final class StreamBible extends Bible {
      */
     @Override
     public long findWordOccurrences(Verse verse, String word) {
-        return StringUtils.countMatches(verse.getVerse(), word);
+        long k = 0;
+        for (final String s : verse.getVerse().split("\\s+"))
+            if (s.equalsIgnoreCase(word))
+                k++;
+        return k;
+        // for some reason apache lang was deprecated and removed from Spigot 1.19
+        // return StringUtils.countMatches(verse.getVerse(), word);
     }
 
     /**

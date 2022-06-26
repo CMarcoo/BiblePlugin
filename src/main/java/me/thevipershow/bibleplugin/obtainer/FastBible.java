@@ -1,13 +1,14 @@
 package me.thevipershow.bibleplugin.obtainer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import me.thevipershow.bibleplugin.data.Bible;
 import me.thevipershow.bibleplugin.data.Book;
 import me.thevipershow.bibleplugin.data.Chapter;
 import me.thevipershow.bibleplugin.data.Verse;
-import org.apache.commons.lang.StringUtils;
+import org.bukkit.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public final class FastBible extends Bible {
     public FastBible(List<Book> books) {
@@ -70,7 +71,13 @@ public final class FastBible extends Bible {
      */
     @Override
     public long findWordOccurrences(Verse verse, String word) {
-        return StringUtils.countMatches(verse.getVerse(), word);
+        long k = 0;
+        for (final String s : verse.getVerse().split("\\s+"))
+            if (s.equalsIgnoreCase(word))
+                k++;
+        return k;
+       // for some reason apache lang was deprecated and removed from Spigot 1.19
+       // return StringUtils.countMatches(verse.getVerse(), word);
     }
 
     /**

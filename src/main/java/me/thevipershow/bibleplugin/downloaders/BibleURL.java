@@ -12,7 +12,7 @@ public enum BibleURL {
     final String URL;
     final String name;
 
-    BibleURL(String URL, String name) {
+    BibleURL(final String URL, final String name) {
         this.URL = URL;
         this.name = name;
     }

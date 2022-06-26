@@ -64,7 +64,4 @@ public final class BibleDownloader {
         return Optional.empty();
     }
 
-    public File getBIBLE_FOLDER() {
-        return BIBLE_FOLDER;
-    }
 }

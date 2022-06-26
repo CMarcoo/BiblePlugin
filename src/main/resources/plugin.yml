@@ -1,5 +1,5 @@
 name: 'BiblePlugin'
-version: @version@
+version: 1.2.0
 main: me.thevipershow.bibleplugin.BiblePlugin
 authors: [TheViperShow]
 api-version: '1.13'
