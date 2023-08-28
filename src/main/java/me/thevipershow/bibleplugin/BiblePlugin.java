@@ -5,6 +5,7 @@ import me.thevipershow.bibleplugin.commands.BibleCommand;
 import me.thevipershow.bibleplugin.data.Bible;
 import me.thevipershow.bibleplugin.downloaders.BibleURL;
 import me.thevipershow.bibleplugin.exceptions.BibleException;
+import me.thevipershow.bibleplugin.listeners.BibleJoinMessage;
 import me.thevipershow.bibleplugin.managers.BibleManager;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,10 +51,11 @@ public final class BiblePlugin extends JavaPlugin {
         bibleManager.getBibleDownloader().createBibleFolder(Exception::printStackTrace);
 
         loadDefaults();
-
         assignBible();
 
-        getCommand("bible").setExecutor(BibleCommand.getInstance(this));
+        BibleCommand bibleCommand = BibleCommand.getInstance(this);
+        getCommand("bible").setExecutor(bibleCommand);
+        getServer().getPluginManager().registerEvents(new BibleJoinMessage(bibleCommand), this);
     }
 
     /**

@@ -55,7 +55,7 @@ public final class BibleCommand implements CommandExecutor {
             builder.append("&a").append(value.name()).append("&7, ");
 
         builder.setLength(builder.length() - 2);
-        sender.sendMessage(colour("&8[&eBiblePlugin&8]&f: &7" + builder.toString()));
+        sender.sendMessage(colour("&8[&eBiblePlugin&8]&f: &7" + builder));
     }
 
     private void sendDownloaded(CommandSender sender) {
@@ -70,7 +70,7 @@ public final class BibleCommand implements CommandExecutor {
         sender.sendMessage(colour("&8[&eBiblePlugin&8]&f: &7" + builder.toString()));
     }
 
-    private void downloadBible(CommandSender sender, String bibleName) {
+    public void downloadBible(CommandSender sender, String bibleName) {
         try {
             BibleURL bibleURL = BibleURL.valueOf(bibleName.toUpperCase(Locale.ROOT));
             final long operationStartTime = System.currentTimeMillis();
@@ -84,7 +84,7 @@ public final class BibleCommand implements CommandExecutor {
         }
     }
 
-    private void printNavigator(Player player) {
+    public void printNavigator(Player player) {
         PlayerBibleData playerBibleData = bibleDataManager.getPlayerBibleDataMap().get(player.getUniqueId());
         Bible currentBible = playerBibleData.getCurrentBible();
         Book currentBook = playerBibleData.getCurrentBook();
@@ -111,7 +111,7 @@ public final class BibleCommand implements CommandExecutor {
         player.spigot().sendMessage(result);
     }
 
-    private void searchForVerse(CommandSender sender, String bibleName, String verseSearch) {
+    public void searchForVerse(CommandSender sender, String bibleName, String verseSearch) {
         try {
             String[] array = BibleGuard.validateGetVerse(verseSearch);
             String bookName = array[0];
