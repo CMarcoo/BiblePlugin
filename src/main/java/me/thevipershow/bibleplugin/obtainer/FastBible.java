@@ -4,7 +4,6 @@ import me.thevipershow.bibleplugin.data.Bible;
 import me.thevipershow.bibleplugin.data.Book;
 import me.thevipershow.bibleplugin.data.Chapter;
 import me.thevipershow.bibleplugin.data.Verse;
-import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,7 @@ public final class FastBible extends Bible {
     @Override
     public long findWordOccurrences(Book book, String word) {
         long count = 0L;
-        for (final Chapter chapter : book.getChapters())
+        for (final Chapter chapter : book.chapters())
             count += findWordOccurrences(chapter, word);
 
         return count;
@@ -56,7 +55,7 @@ public final class FastBible extends Bible {
     @Override
     public long findWordOccurrences(Chapter chapter, String word) {
         long count = 0L;
-        for (final Verse verse : chapter.getVerses())
+        for (final Verse verse : chapter.verses())
             count += findWordOccurrences(verse, word);
 
         return count;
@@ -72,7 +71,7 @@ public final class FastBible extends Bible {
     @Override
     public long findWordOccurrences(Verse verse, String word) {
         long k = 0;
-        for (final String s : verse.getVerse().split("\\s+"))
+        for (final String s : verse.verse().split("\\s+"))
             if (s.equalsIgnoreCase(word))
                 k++;
         return k;
@@ -105,7 +104,7 @@ public final class FastBible extends Bible {
     @Override
     public List<Verse> findVerseContainingWord(Book book, String word) {
         final List<Verse> verses = new ArrayList<>();
-        for (final Chapter chapter : book.getChapters())
+        for (final Chapter chapter : book.chapters())
             verses.addAll(findVerseContainingWord(chapter, word));
 
         return verses;
@@ -121,8 +120,8 @@ public final class FastBible extends Bible {
     @Override
     public List<Verse> findVerseContainingWord(Chapter chapter, String word) {
         final List<Verse> verses = new ArrayList<>();
-        for (final Verse verse : chapter.getVerses())
-            if (verse.getVerse().contains(word))
+        for (final Verse verse : chapter.verses())
+            if (verse.verse().contains(word))
                 verses.add(verse);
 
         return verses;
@@ -137,7 +136,7 @@ public final class FastBible extends Bible {
     @Override
     public Optional<Book> findBook(String name) {
         for (final Book book : this.getBooks())
-            if (book.getName().equalsIgnoreCase(name))
+            if (book.name().equalsIgnoreCase(name))
                 return Optional.of(book);
 
         return Optional.empty();

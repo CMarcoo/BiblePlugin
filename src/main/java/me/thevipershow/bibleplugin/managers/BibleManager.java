@@ -59,16 +59,16 @@ public final class BibleManager {
         }
     }
 
-    public final BibleDownloader getBibleDownloader() {
+    public BibleDownloader getBibleDownloader() {
         return bibleDownloader;
     }
 
     /**
-     * Get all of the currently loaded bibles
+     * Get all the currently loaded bibles
      *
      * @return a HashSet of Bibles
      */
-    public final HashSet<Bible> getLoadedBibles() {
+    public HashSet<Bible> getLoadedBibles() {
         return loadedBibles;
     }
 
@@ -78,7 +78,7 @@ public final class BibleManager {
      * @param bibleName The name of the bible to search for.
      * @return An Optional with the Bible if found, an empty Optional otherwise.
      */
-    public final Optional<Bible> getBible(String bibleName) {
+    public Optional<Bible> getBible(String bibleName) {
         for (final Bible bible : loadedBibles) {
             if (bible.getName().equalsIgnoreCase(bibleName))
                 return Optional.of(bible);

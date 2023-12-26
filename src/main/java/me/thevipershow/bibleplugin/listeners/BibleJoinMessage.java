@@ -11,6 +11,7 @@ import java.util.Random;
 public class BibleJoinMessage implements Listener {
 
     private final BibleCommand bibleCommand;
+    private int last = 0;
 
     public BibleJoinMessage(BibleCommand bibleCommand) {
         this.bibleCommand = bibleCommand;
@@ -34,8 +35,16 @@ public class BibleJoinMessage implements Listener {
     };
 
     public String getRandomGodVerse() {
-        return godFavouriteVerses[new Random().nextInt(0, godFavouriteVerses.length-1)];
+        String toReturnStr;
+        int temp;
+        do {
+            temp = new Random().nextInt(0, godFavouriteVerses.length-1);
+            toReturnStr = godFavouriteVerses[temp];
+        } while (temp == last);
+        last = temp;
+        return toReturnStr;
     }
+
     @EventHandler
     public void onEvent(PlayerJoinEvent event) {
         Player player = event.getPlayer();

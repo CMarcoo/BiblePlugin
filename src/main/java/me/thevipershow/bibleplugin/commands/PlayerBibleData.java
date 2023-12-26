@@ -13,6 +13,8 @@ public class PlayerBibleData {
     private Chapter currentChapter;
     private Verse currentVerse;
 
+    private boolean loginverse = true;
+
     public PlayerBibleData() {}
 
     public PlayerBibleData(UUID uuid, Bible currentBible, Book currentBook, Chapter currentChapter, Verse currentVerse) {
@@ -114,5 +116,13 @@ public class PlayerBibleData {
      */
     public final void setCurrentVerse(Verse currentVerse) {
         this.currentVerse = currentVerse;
+    }
+
+    public boolean isLoginverse() {
+        return loginverse;
+    }
+
+    public void setLoginverse(boolean loginverse) {
+        this.loginverse = loginverse;
     }
 }

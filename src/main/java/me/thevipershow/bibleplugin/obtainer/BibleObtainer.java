@@ -24,7 +24,7 @@ public interface BibleObtainer {
      */
     default List<Chapter> getChapters(Bible bible) {
         final List<Chapter> chapters = new ArrayList<>();
-        getBooks(bible).forEach(book -> chapters.addAll(book.getChapters()));
+        getBooks(bible).forEach(book -> chapters.addAll(book.chapters()));
         return chapters;
     }
 
@@ -35,7 +35,7 @@ public interface BibleObtainer {
      */
     default List<Verse> getVerses(Bible bible) {
         final List<Verse> verses = new ArrayList<>();
-        getChapters(bible).forEach(chapter -> verses.addAll(chapter.getVerses()));
+        getChapters(bible).forEach(chapter -> verses.addAll(chapter.verses()));
         return verses;
     }
 

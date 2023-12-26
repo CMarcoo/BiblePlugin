@@ -10,6 +10,8 @@ public enum Permission {
     BOOKS("bible.commands.books"),
     VERSES("bible.commands.verses"),
     CHAPTERS("bible.commands.chapters"),
+
+    LOGIN_VERSE("bible.commands.loginverse"),
     FIND("bible.commands.find");
 
     private final String permission;

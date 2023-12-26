@@ -51,7 +51,7 @@ public final class BibleGuard {
             throw new BibleException("books were null");
         if (bible.getBooks().isEmpty())
             throw new BibleException("no books were found");
-        if (bible.getBooks().stream().mapToLong(book -> book.getChapters().size()).sum() == 0)
+        if (bible.getBooks().stream().mapToLong(book -> book.chapters().size()).sum() == 0)
             throw new BibleException("no chapters were found");
         return bible;
     }

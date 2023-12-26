@@ -38,7 +38,7 @@ public final class ParallelBibleObtainer implements BibleObtainer {
      */
     @Override
     public List<Chapter> getChapters(Bible bible) {
-        return getBooks(bible).parallelStream().flatMap(book -> book.getChapters().parallelStream()).collect(Collectors.toList());
+        return getBooks(bible).parallelStream().flatMap(book -> book.chapters().parallelStream()).collect(Collectors.toList());
     }
 
     /**
@@ -49,7 +49,7 @@ public final class ParallelBibleObtainer implements BibleObtainer {
      */
     @Override
     public List<Verse> getVerses(Bible bible) {
-        return getChapters(bible).parallelStream().flatMap(chapter -> chapter.getVerses().parallelStream()).collect(Collectors.toList());
+        return getChapters(bible).parallelStream().flatMap(chapter -> chapter.verses().parallelStream()).collect(Collectors.toList());
     }
 
     @Override

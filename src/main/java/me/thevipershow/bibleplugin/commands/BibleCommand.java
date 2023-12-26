@@ -12,7 +12,6 @@ import me.thevipershow.bibleplugin.managers.BibleManager;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -91,19 +90,19 @@ public final class BibleCommand implements CommandExecutor {
         Chapter chapter = playerBibleData.getCurrentChapter();
         Verse currentVerse = playerBibleData.getCurrentVerse();
         final BaseComponent result = new TextComponent();
-        if (currentVerse != null && chapter.getVerses().size() >= currentVerse.getNumber() + 1) {
+        if (currentVerse != null && chapter.verses().size() >= currentVerse.number() + 1) {
             BaseComponent component = new TextComponent(colour("&7[&aNEXT VERSE&7]"));
             component.setClickEvent(new ClickEvent(
                     ClickEvent.Action.RUN_COMMAND,
-                    String.format("/bible verse %s %s:%d:%d", currentBible.getName(), currentBook.getName(), chapter.getNumber(), currentVerse.getNumber() + 1)));
+                    String.format("/bible verse %s %s:%d:%d", currentBible.getName(), currentBook.name(), chapter.number(), currentVerse.number() + 1)));
 
             result.addExtra(component);
         }
-        if (currentVerse != null && currentVerse.getNumber() - 1 >= 1 && chapter.getVerses().size() >= currentVerse.getNumber() -1) {
+        if (currentVerse != null && currentVerse.number() - 1 >= 1 && chapter.verses().size() >= currentVerse.number() -1) {
             BaseComponent component = new TextComponent(colour("&7[&aPREV. VERSE&7]"));
             component.setClickEvent(new ClickEvent(
                     ClickEvent.Action.RUN_COMMAND,
-                    String.format("/bible verse %s %s:%d:%d", currentBible.getName(), currentBook.getName(), chapter.getNumber(), currentVerse.getNumber() - 1)));
+                    String.format("/bible verse %s %s:%d:%d", currentBible.getName(), currentBook.name(), chapter.number(), currentVerse.number() - 1)));
 
             result.addExtra(component);
         }
@@ -121,9 +120,8 @@ public final class BibleCommand implements CommandExecutor {
             Chapter chapter = BibleOptionals.optionalChapterSearch(book, chapterNumber);
             Verse verse = BibleOptionals.optionalVerseSearch(chapter, verseNumber);
             //sender.sendMessage(colour("&8[&eBiblePlugin&8]&f: &7" + verse.getVerse()));
-            sender.sendMessage(colour("&7  " + verse.getVerse()));
-            if (sender instanceof Player) { // Checking for Player identity
-                Player player = (Player) sender;
+            sender.sendMessage(colour("&7  " + verse.verse()));
+            if (sender instanceof Player player) { // Checking for Player identity
                 bibleDataManager.update(player, BibleSection.BIBLE, bible);     // Updating the newly found values
                 bibleDataManager.update(player, BibleSection.BOOK, book);       // into his data map.
                 bibleDataManager.update(player, BibleSection.CHAPTER, chapter); //
@@ -143,7 +141,7 @@ public final class BibleCommand implements CommandExecutor {
             Chapter chapter = BibleOptionals.optionalChapterSearch(BibleOptionals.optionalBookSearch(BibleOptionals.optionalBibleSearch(bibleManager, bibleName), bookName), chapterNumber);
             sender.sendMessage(colour("&8[&eBiblePlugin&8]&f: &7Chapter &f`&e" + chapterNumber
                     + "&f`&7 from book &f`&e" + bookName
-                    + "&f`&7 from Bible &f`&e" + bibleName + "&f`" + "&7 has &f`&e" + chapter.getVerses().size() + "&f`&7 verses."));
+                    + "&f`&7 from Bible &f`&e" + bibleName + "&f`" + "&7 has &f`&e" + chapter.verses().size() + "&f`&7 verses."));
         } catch (BibleException bibleException) {
             sender.sendMessage(colour(bibleException.getMessage()));
         }
@@ -154,7 +152,7 @@ public final class BibleCommand implements CommandExecutor {
             final String[] array = BibleGuard.validateChapterSearch(search);
             final String bibleName = array[0], bookName = array[1];
             Book book = BibleOptionals.optionalBookSearch(BibleOptionals.optionalBibleSearch(bibleManager, bibleName), bookName);
-            sender.sendMessage(colour("&8[&eBiblePlugin&8]&f: &7Book &f`&e" + bookName + "&f`&7 from Bible &f`&e" + bibleName + "&f`" + "&7 has &f`&e" + book.getChapters().size() + "&f`&7 chapters."));
+            sender.sendMessage(colour("&8[&eBiblePlugin&8]&f: &7Book &f`&e" + bookName + "&f`&7 from Bible &f`&e" + bibleName + "&f`" + "&7 has &f`&e" + book.chapters().size() + "&f`&7 chapters."));
         } catch (BibleException bibleException) {
             sender.sendMessage(colour(bibleException.getMessage()));
         }
@@ -163,7 +161,7 @@ public final class BibleCommand implements CommandExecutor {
     private void printBooks(CommandSender sender, Bible bible) {
         final StringBuilder builder = new StringBuilder();
         for (final Book book : bible.getBooks())
-            builder.append("&e").append(book.getName()).append("&7, ");
+            builder.append("&e").append(book.name()).append("&7, ");
         builder.setLength(builder.length() - 2);
         sender.sendMessage(colour("&8[&eList&8]&7: " + builder.toString()));
     }
@@ -232,6 +230,15 @@ public final class BibleCommand implements CommandExecutor {
         }
     }
 
+    private void disableLoginMessage(CommandSender sender) {
+        if (sender instanceof Player player) {
+            boolean newvalue = bibleDataManager.updateLoginVerse(player);
+            player.sendMessage(colour("&aYour messages have been successfully " + (newvalue ? "enabled" : "disabled")));
+        } else {
+            sender.sendMessage(colour("&cThis cannot be executed from a console!"));
+        }
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         final int length = args.length;
@@ -239,41 +246,29 @@ public final class BibleCommand implements CommandExecutor {
             return false;
         } else {
             switch (length) {
-                case 1:
+                case 1 -> {
                     switch (args[0].toLowerCase(Locale.ROOT)) {
-                        case "available":
-                            permissionCheck(sender, Permission.AVAILABLE, this::sendAvailable);
-                            break;
-                        case "downloaded":
-                            permissionCheck(sender, Permission.DOWNLOADED, this::sendDownloaded);
-                            break;
-                        default:
+                        case "available" -> permissionCheck(sender, Permission.AVAILABLE, this::sendAvailable);
+                        case "downloaded" -> permissionCheck(sender, Permission.DOWNLOADED, this::sendDownloaded);
+                        case "loginverse" -> permissionCheck(sender, Permission.LOGIN_VERSE, this::disableLoginMessage);
+                        default -> {
                             return false;
-                    }
-                    break;
-                case 2: {
-                    switch (args[0].toLowerCase(Locale.ROOT)) {
-                        case "download":
-                            permissionCheck(sender, Permission.DOWNLOAD, s -> downloadBible(s, args[1]));
-                            break;
-                        case "books":
-                            permissionCheck(sender, Permission.BOOKS, s -> getBooks(sender, args[1]));
-                            break;
-                        case "chapters":
-                            permissionCheck(sender, Permission.CHAPTERS, s -> getChapters(s, args[1]));
-                            break;
-                        case "verses":
-                            permissionCheck(sender, Permission.VERSES, s -> getVerses(s, args[1]));
-                            break;
-                        case "load":
-                            permissionCheck(sender, Permission.LOAD, s -> loadBible(args[1], s));
-                            break;
-                        default:
-                            return false;
+                        }
                     }
                 }
-                break;
-                case 3: {
+                case 2 -> {
+                    switch (args[0].toLowerCase(Locale.ROOT)) {
+                        case "download" -> permissionCheck(sender, Permission.DOWNLOAD, s -> downloadBible(s, args[1]));
+                        case "books" -> permissionCheck(sender, Permission.BOOKS, s -> getBooks(sender, args[1]));
+                        case "chapters" -> permissionCheck(sender, Permission.CHAPTERS, s -> getChapters(s, args[1]));
+                        case "verses" -> permissionCheck(sender, Permission.VERSES, s -> getVerses(s, args[1]));
+                        case "load" -> permissionCheck(sender, Permission.LOAD, s -> loadBible(args[1], s));
+                        default -> {
+                            return false;
+                        }
+                    }
+                }
+                case 3 -> {
                     switch (args[0].toLowerCase(Locale.ROOT)) {
                         case "verse": {
                             permissionCheck(sender, Permission.VERSE, s -> searchForVerse(s, args[1], args[2]));
@@ -303,9 +298,9 @@ public final class BibleCommand implements CommandExecutor {
                         break;
                     }
                 }
-                break;
-                default:
+                default -> {
                     return false;
+                }
             }
         }
         return true;

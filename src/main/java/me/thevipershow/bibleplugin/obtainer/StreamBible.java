@@ -33,7 +33,7 @@ public final class StreamBible extends Bible {
      */
     @Override
     public long findWordOccurrences(Book book, String word) {
-        return book.getChapters().stream().mapToLong(chapter -> findWordOccurrences(chapter, word)).sum();
+        return book.chapters().stream().mapToLong(chapter -> findWordOccurrences(chapter, word)).sum();
     }
 
     /**
@@ -45,7 +45,7 @@ public final class StreamBible extends Bible {
      */
     @Override
     public long findWordOccurrences(Chapter chapter, String word) {
-        return chapter.getVerses().stream().mapToLong(verse -> findWordOccurrences(verse, word)).sum();
+        return chapter.verses().stream().mapToLong(verse -> findWordOccurrences(verse, word)).sum();
     }
 
     /**
@@ -58,7 +58,7 @@ public final class StreamBible extends Bible {
     @Override
     public long findWordOccurrences(Verse verse, String word) {
         long k = 0;
-        for (final String s : verse.getVerse().split("\\s+"))
+        for (final String s : verse.verse().split("\\s+"))
             if (s.equalsIgnoreCase(word))
                 k++;
         return k;
@@ -88,7 +88,7 @@ public final class StreamBible extends Bible {
      */
     @Override
     public List<Verse> findVerseContainingWord(Book book, String word) {
-        return book.getChapters().stream()
+        return book.chapters().stream()
                 .flatMap(chapter -> findVerseContainingWord(chapter, word).stream())
                 .collect(Collectors.toList());
     }
@@ -102,7 +102,7 @@ public final class StreamBible extends Bible {
      */
     @Override
     public List<Verse> findVerseContainingWord(Chapter chapter, String word) {
-        return chapter.getVerses().stream().filter(verse -> verse.getVerse().contains(word)).collect(Collectors.toList());
+        return chapter.verses().stream().filter(verse -> verse.verse().contains(word)).collect(Collectors.toList());
     }
 
     /**
@@ -113,6 +113,6 @@ public final class StreamBible extends Bible {
      */
     @Override
     public Optional<Book> findBook(String name) {
-        return this.getBooks().stream().filter(book -> book.getName().equalsIgnoreCase(name)).findFirst();
+        return this.getBooks().stream().filter(book -> book.name().equalsIgnoreCase(name)).findFirst();
     }
 }

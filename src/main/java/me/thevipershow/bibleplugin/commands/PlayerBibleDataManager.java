@@ -55,7 +55,7 @@ public final class PlayerBibleDataManager {
      * @param bibleSection The BibleSection to update.
      * @param newData The new data Object.
      */
-    public final void update(Player player, BibleSection bibleSection, Object newData) throws BibleException {
+    public void update(Player player, BibleSection bibleSection, Object newData) throws BibleException {
         if (bibleSection.isValidObject(newData)) {
             if (this.playerBibleDataMap.containsKey(player.getUniqueId())) {
                 PlayerBibleData playerBibleData = this.playerBibleDataMap.get(player.getUniqueId());
@@ -68,6 +68,19 @@ public final class PlayerBibleDataManager {
         } else {
             throw new BibleException("An illegal object has been tried to be inserted into " + player.getName() + "'s PlayerBibleData." +
                     "\nThe Object passed was of type " + newData.getClass().getSimpleName() + " , but the required was " + bibleSection.getRequiredType().getName());
+        }
+    }
+
+    public boolean updateLoginVerse(Player player) {
+        if (this.playerBibleDataMap.containsKey(player.getUniqueId())) {
+            PlayerBibleData playerBibleData = this.playerBibleDataMap.get(player.getUniqueId());
+            final boolean currentStatus = playerBibleData.isLoginverse();
+            playerBibleData.setLoginverse(!currentStatus);
+            return (!currentStatus);
+        } else {
+            PlayerBibleData playerBibleData = this.playerBibleDataMap.put(player.getUniqueId(), new PlayerBibleData());
+            playerBibleData.setLoginverse(false);
+            return false;
         }
     }
 }

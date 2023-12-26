@@ -2,7 +2,7 @@ package me.thevipershow.bibleplugin;
 
 import java.util.Locale;
 import me.thevipershow.bibleplugin.commands.BibleCommand;
-import me.thevipershow.bibleplugin.data.Bible;
+import me.thevipershow.bibleplugin.data.BibleType;
 import me.thevipershow.bibleplugin.downloaders.BibleURL;
 import me.thevipershow.bibleplugin.exceptions.BibleException;
 import me.thevipershow.bibleplugin.listeners.BibleJoinMessage;
@@ -14,12 +14,12 @@ public final class BiblePlugin extends JavaPlugin {
     private BibleManager bibleManager;
 
     private static Plugin plugin = null;
-    private static Bible.BibleType preferred = Bible.BibleType.FAST;
+    private static BibleType preferred = BibleType.FAST;
 
     private void assignBible() {
         String choosenType = getConfig().getString("bible.implementation");
         if (choosenType != null) {
-            for (final Bible.BibleType value : Bible.BibleType.values()) {
+            for (final BibleType value : BibleType.values()) {
                 if (value.getName().equalsIgnoreCase(choosenType)) {
                     preferred = value;
                     break;
@@ -44,7 +44,7 @@ public final class BiblePlugin extends JavaPlugin {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public final void onEnable() {
+    public void onEnable() {
         plugin = this;
         saveDefaultConfig();
         bibleManager = BibleManager.getInstance(this);
@@ -70,7 +70,7 @@ public final class BiblePlugin extends JavaPlugin {
      * Expose the preferred bible implementation type.
      * @return BibleType. never null.
      */
-    public static Bible.BibleType getPreferredBibleType() {
+    public static BibleType getPreferredBibleType() {
         return preferred;
     }
 }

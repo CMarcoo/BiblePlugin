@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import me.thevipershow.bibleplugin.exceptions.ExceptionHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -55,8 +57,9 @@ public final class BibleDownloader {
     }
 
     public Optional<String> getBibleRawContent(BibleURL bibleURL, ExceptionHandler handler) {
-        try {
-            String rawContent = Files.lines(Paths.get(getBibleFileName(bibleURL))).collect(Collectors.joining());
+        try (Stream<String> str = Files.lines(Paths.get(getBibleFileName(bibleURL)))) {
+            String rawContent;
+            rawContent = str.collect(Collectors.joining());
             return Optional.of(rawContent);
         } catch (final IOException e) {
             handler.handle(e);

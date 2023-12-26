@@ -8,40 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import me.thevipershow.bibleplugin.BiblePlugin;
-import me.thevipershow.bibleplugin.obtainer.FastBible;
-import me.thevipershow.bibleplugin.obtainer.ParallelStreamBible;
-import me.thevipershow.bibleplugin.obtainer.StreamBible;
 
 public abstract class Bible {
-
-    public enum BibleType {
-        STREAM(StreamBible.class, "stream"), PARALLEL_STREAM(ParallelStreamBible.class, "parallel-stream"), FAST(FastBible.class, "fast");
-
-        private final Class<? extends Bible> bibleImpl;
-        private final String name;
-
-        BibleType(Class<? extends Bible> bibleImpl, String name) {
-            this.bibleImpl = bibleImpl;
-            this.name = name;
-        }
-
-        public final Bible build(final List<Book> books) {
-            try {
-                return bibleImpl.getConstructor(List.class).newInstance(books);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        public final Class<? extends Bible> getBibleImpl() {
-            return bibleImpl;
-        }
-
-        public final String getName() {
-            return name;
-        }
-    }
 
     /**
      * Deserializer used to read a bible from my standard JSON formatting.
@@ -110,7 +78,7 @@ public abstract class Bible {
      */
     public Optional<Book> getBook(String bookName) {
         for (final Book book : books) {
-            if (book.getName().equalsIgnoreCase(bookName)) {
+            if (book.name().equalsIgnoreCase(bookName)) {
                 return Optional.of(book);
             }
         }
@@ -126,8 +94,8 @@ public abstract class Bible {
      * @return An Optional with the chapter if it was found, an empty Optional otherwise.
      */
     public Optional<Chapter> getChapter(Book book, int chapterNumber) {
-        if (chapterNumber > 0 && chapterNumber <= book.getChapters().size()) {
-            return Optional.of(book.getChapters().get(chapterNumber - 1));
+        if (chapterNumber > 0 && chapterNumber <= book.chapters().size()) {
+            return Optional.of(book.chapters().get(chapterNumber - 1));
         }
         return Optional.empty();
     }
@@ -156,8 +124,8 @@ public abstract class Bible {
      * @return An Optional with the verse if it was found, an empty Optional otherwise.
      */
     public Optional<Verse> getVerse(Chapter chapter, int verseNumber) {
-        if (chapter.getVerses().size() <= verseNumber) {
-            return Optional.of(chapter.getVerses().get(verseNumber - 1));
+        if (chapter.verses().size() <= verseNumber) {
+            return Optional.of(chapter.verses().get(verseNumber - 1));
         }
         return Optional.empty();
     }
