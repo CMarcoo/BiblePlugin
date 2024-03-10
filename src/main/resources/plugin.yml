@@ -1,6 +1,6 @@
 name: 'BiblePlugin'
-version: 1.3.2
-main: me.thevipershow.bibleplugin.BiblePlugin
+version: "1.4.0-ALPHA"
+main: "top.cmarco.bibleplugin.BiblePlugin"
 authors: [TheViperShow]
 api-version: '1.13'
 description: 'A Minecraft plugin to interact with the sacred text.'
